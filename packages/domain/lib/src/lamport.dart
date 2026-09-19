@@ -21,4 +21,7 @@ class LamportClock {
     }
     return ++_value;
   }
+
+  /// 重置（演示/测试用；生产路径不调用）。
+  void reset([int value = 0]) => _value = value;
 }

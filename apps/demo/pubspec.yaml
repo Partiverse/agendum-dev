@@ -1,0 +1,22 @@
+name: agendum_demo
+description: Web 端开发成果演示 —— 真实引擎代码（domain/nlp/sync）经 dart2js 编译到浏览器运行。
+version: 0.0.1
+publish_to: none
+resolution: workspace
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  agendum_domain:
+    ^0.0.1
+  agendum_nlp:
+    ^0.0.1
+  agendum_protocol:
+    ^0.0.1
+  agendum_sync:
+    ^0.0.1
+  web: ^1.1.0
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.0

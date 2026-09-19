@@ -1,0 +1,7 @@
+id: zh-024
+now: "2026-09-16T09:00:00"
+input: "本周五 复盘"
+expect:
+  due_date: "2026-09-18"
+  title_exact: "复盘"
+tags: [zh, weekday, this-week]

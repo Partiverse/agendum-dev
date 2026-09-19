@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>程簿 Agendum · Phase 0 开发成果演示</title>
+<style>
+  :root {
+    --bg: #0e1116; --panel: #161a22; --panel2: #1b2029; --border: #242b37;
+    --text: #e6e8ee; --muted: #98a2b3; --accent: #34d399; --accent2: #22d3ee;
+    --danger: #f87171; --amber: #fbbf24;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    line-height: 1.55;
+  }
+  header {
+    padding: 28px 32px 18px;
+    background: linear-gradient(180deg, #12161e 0%, var(--bg) 100%);
+    border-bottom: 1px solid var(--border);
+  }
+  header h1 { margin: 0; font-size: 22px; letter-spacing: .5px; }
+  header h1 .en { color: var(--accent); font-weight: 600; }
+  header p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+  #tabs { display: flex; gap: 8px; padding: 14px 32px 0; flex-wrap: wrap; }
+  .tab-btn {
+    background: var(--panel); color: var(--muted); border: 1px solid var(--border);
+    border-radius: 999px; padding: 8px 18px; font-size: 14px; cursor: pointer;
+  }
+  .tab-btn.active { background: #12291f; color: var(--accent); border-color: #1f513c; }
+  main { padding: 20px 32px 64px; max-width: 980px; margin: 0 auto; }
+  .pane { display: none; }
+  .pane-desc { color: var(--muted); font-size: 13.5px; margin: 4px 0 16px; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .chip-row.center { justify-content: center; }
+  .chip {
+    background: var(--panel); border: 1px solid var(--border); color: var(--text);
+    border-radius: 999px; padding: 6px 14px; font-size: 13px; cursor: pointer;
+  }
+  .chip:hover { border-color: var(--accent); }
+  .chip.accent { background: #12291f; border-color: #1f513c; color: var(--accent); }
+  .chip.danger { background: #2a1518; border-color: #52262b; color: var(--danger); }
+  .chip.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .chip.big-chip { padding: 9px 22px; font-size: 14px; }
+  .capture-input {
+    width: 100%; background: var(--panel2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 12px; padding: 13px 16px;
+    font-size: 16px; outline: none; margin-bottom: 14px;
+  }
+  .capture-input:focus { border-color: var(--accent); }
+  .capture-input.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .hint { color: var(--muted); font-size: 13px; margin: 10px 0; }
+  .hint.ok { color: var(--accent); }
+  .hint.bad { color: var(--danger); }
+  .card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    padding: 12px 16px;
+  }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin: 12px 0; }
+  .card-label { color: var(--muted); font-size: 12px; letter-spacing: .4px; }
+  .card-value { font-size: 15px; margin-top: 3px; }
+  .card-value.big { font-size: 19px; font-weight: 600; }
+  .title-card { margin-bottom: 4px; border-color: #2b3b4d; }
+  .conf-row { display: flex; align-items: center; gap: 12px; margin: 14px 0; }
+  .conf-track { flex: 0 1 320px; height: 8px; background: var(--panel2); border-radius: 999px; overflow: hidden; }
+  .conf-fill { height: 100%; border-radius: 999px; transition: width .25s ease; }
+  .conf-fill.good { background: var(--accent); }
+  .conf-fill.mid { background: var(--amber); }
+  .conf-fill.low { background: var(--danger); }
+  .conf-num { color: var(--muted); font-size: 13px; }
+  .amb-box { background: #2a2313; border: 1px solid #4d3f16; border-radius: 10px; padding: 10px 14px; }
+  .amb-item { color: var(--amber); font-size: 13px; }
+  .sync-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 720px) { .sync-row { grid-template-columns: 1fr; } }
+  .sync-panel { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .sync-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+  .dev-name { font-weight: 700; font-size: 15px; }
+  .dev-lamport { color: var(--accent2); font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; }
+  .dev-status { margin: 10px 0 6px; min-height: 58px; }
+  .dev-title { font-size: 17px; font-weight: 600; }
+  .dev-title.muted { color: var(--muted); font-weight: 400; font-size: 14px; }
+  .dev-title.tomb { color: var(--muted); }
+  .dev-version { color: var(--muted); font-size: 12px; font-family: ui-monospace, Menlo, monospace; margin-top: 2px; }
+  .sync-log { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; margin-top: 12px; }
+  .log-line { padding: 3px 0; }
+  .log-mono { font-family: ui-monospace, Menlo, monospace; font-size: 13px; color: var(--text); }
+  .occ-list { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 8px 16px; margin-top: 8px; }
+  .occ-line { display: flex; gap: 14px; padding: 6px 0; border-bottom: 1px dashed var(--border); }
+  .occ-line:last-child { border-bottom: none; }
+  .occ-idx { color: var(--accent2); font-family: ui-monospace, Menlo, monospace; font-size: 13px; min-width: 30px; }
+  .status-pill {
+    display: inline-block; background: var(--panel); border: 1px solid var(--border);
+    padding: 10px 20px; border-radius: 999px; font-size: 15px; font-weight: 600; margin-bottom: 14px;
+  }
+  .status-pill.terminal { color: var(--muted); text-decoration: line-through; text-decoration-color: #566; }
+  .status-btn.active { border-color: var(--accent); color: var(--accent); }
+  footer { color: var(--muted); font-size: 12px; text-align: center; padding: 18px; border-top: 1px solid var(--border); }
+  code { color: var(--accent2); }
+</style>
+</head>
+<body>
+<header>
+  <h1>程簿 <span class="en">Agendum</span> · Phase 0 开发成果演示</h1>
+  <p>以下演示全部由仓库中的真实 Dart 引擎代码经 dart2js 编译后在本页内运行 —— 不是 mock。</p>
+</header>
+<nav id="tabs"></nav>
+<main id="content"></main>
+<footer>packages/nlp · packages/sync · packages/protocol · packages/domain ｜ 智能捕获解析准确率目标 ≥95%（报告 §5.3）</footer>
+<script src="main.dart.js" defer></script>
+</body>
+</html>

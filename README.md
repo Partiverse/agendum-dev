@@ -52,4 +52,5 @@
 | 日期 | 里程碑 | 说明 |
 | --- | --- | --- |
 | 2026-09-19 | **Phase 0 W1（S01 工程线）完成** | monorepo 初始化：pub workspaces（ADR-015）＋ 6 个工作区成员（domain/protocol/sync/nlp/server/eval）；domain（状态机、Lamport、RRULE 子集、分数索引）、protocol（oplog 契约）、sync（字段级 LWW）、nlp（捕获解析规则引擎 v0）均有实现与测试，共 89 例全绿；黄金评估集种子 20 例 + harness CLI（100% 通过）；server 契约骨架、docker compose、PR-CI/nightly 工作流就绪；`make ci` 本地全绿 |
+| 2026-09-19 | **Web 演示页上线** | `apps/demo`：四个可交互演示（智能捕获实时解析 / 双设备 LWW 冲突裁决 / RRULE 展开 / GTD 状态机）——真实引擎代码经 dart2js 编译进浏览器，非 mock。`make demo` 启动（http://localhost:8181）；黄金评估集扩至 32 例（100%）；全仓 92 例测试全绿 |
 | 待办 | Flutter SDK 安装与版本锁定（mise.toml） | W7–8 风格样板、S05 客户端接入的前置 |

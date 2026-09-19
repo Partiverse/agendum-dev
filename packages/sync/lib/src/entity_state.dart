@@ -27,6 +27,9 @@ class EntitySyncState {
     return changed;
   }
 
+  /// 重置为空状态（演示/测试用；生产路径不调用）。
+  void reset() => _fields.clear();
+
   /// 与另一副本的字段状态合并（pull 后的双端收敛入口）。
   void mergeInto(EntitySyncState other) {
     other._fields.forEach((name, entry) {

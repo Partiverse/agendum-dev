@@ -9,6 +9,7 @@ workspace:
   - packages/sync
   - packages/nlp
   - apps/server
+  - apps/demo
   - tools/eval
 # 暂不入工作区（依赖未落地时加入会破坏解析）：
 #   packages/db      → S05 引入 Drift 后加入

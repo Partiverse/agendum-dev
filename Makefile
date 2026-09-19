@@ -1,7 +1,7 @@
 # 程簿（Agendum）monorepo 任务编排 —— 使用方式见 02 文档 §9。
-MEMBERS := packages/domain packages/protocol packages/sync packages/nlp apps/server tools/eval
+MEMBERS := packages/domain packages/protocol packages/sync packages/nlp apps/server apps/demo tools/eval
 
-.PHONY: bootstrap analyze test fmt fmt-check eval ci up down clean
+.PHONY: bootstrap analyze test fmt fmt-check eval ci up down demo demo-build clean
 
 bootstrap: ## 解析整个工作区（pub workspaces，无需 melos）
 	dart pub get
@@ -22,6 +22,12 @@ eval: ## 本地跑黄金评估集（replay/本地适配器，零 API 成本）
 	dart run tools/eval/bin/eval.dart run --engine parse --min 0.75
 
 ci: fmt-check analyze test eval ## 本地复现 PR-CI
+
+demo-build: ## dart2js 编译 Web 演示页
+	dart compile js apps/demo/web/main.dart -o apps/demo/web/main.dart.js -O2
+
+demo: demo-build ## 编译并本地起演示页（http://localhost:8181）
+	dart run apps/demo/tool/serve.dart
 
 up: ## 启动本地依赖（Postgres）
 	docker compose up -d

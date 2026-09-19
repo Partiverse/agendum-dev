@@ -1,0 +1,7 @@
+id: zh-017
+now: "2026-09-19T09:00:00"
+input: "下周一晨会"
+expect:
+  due_date: "2026-09-21"
+  title_exact: "晨会"
+tags: [zh, weekday]

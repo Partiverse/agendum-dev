@@ -1,0 +1,7 @@
+id: zh-018
+now: "2026-09-19T09:00:00"
+input: "12:30 午休"
+expect:
+  reminder_time: "12:30"
+  title_exact: "午休"
+tags: [zh, time-only, colon]

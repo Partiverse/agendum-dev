@@ -1,0 +1,7 @@
+id: zh-025
+now: "2026-09-19T09:00:00"
+input: "9月19日交报告"
+expect:
+  due_date: "2026-09-19"
+  title_contains: "交报告"
+tags: [zh, absolute-date, today]

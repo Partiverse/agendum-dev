@@ -1,0 +1,7 @@
+id: zh-020
+now: "2026-09-19T09:00:00"
+input: "1.5小时 深度工作"
+expect:
+  estimate_minutes: 90
+  title_contains: "深度工作"
+tags: [zh, duration, decimal]

@@ -4,6 +4,7 @@ build/
 dist/
 coverage/
 pubspec_overrides.yaml
+apps/demo/web/main.dart.js
 
 # IDE
 .idea/

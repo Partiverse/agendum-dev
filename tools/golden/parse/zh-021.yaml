@@ -1,0 +1,7 @@
+id: zh-021
+now: "2026-09-19T09:00:00"
+input: "半小时 邮件批处理"
+expect:
+  estimate_minutes: 30
+  title_contains: "邮件批处理"
+tags: [zh, duration]

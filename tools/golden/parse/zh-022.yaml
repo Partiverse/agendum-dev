@@ -1,0 +1,7 @@
+id: zh-022
+now: "2026-09-19T09:00:00"
+input: "10月1日放假安排"
+expect:
+  due_date: "2026-10-01"
+  title_contains: "放假安排"
+tags: [zh, absolute-date]

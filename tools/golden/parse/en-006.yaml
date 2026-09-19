@@ -1,0 +1,6 @@
+id: en-006
+now: "2026-09-19T09:00:00"
+input: "buy milk"
+expect:
+  title_exact: "buy milk"
+tags: [en, plain]

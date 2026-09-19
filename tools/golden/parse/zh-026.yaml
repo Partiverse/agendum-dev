@@ -1,0 +1,7 @@
+id: zh-026
+now: "2026-09-19T09:00:00"
+input: "晚上9点健身"
+expect:
+  reminder_time: "21:00"
+  title_exact: "健身"
+tags: [zh, time-only]

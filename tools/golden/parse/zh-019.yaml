@@ -1,0 +1,7 @@
+id: zh-019
+now: "2026-09-19T09:00:00"
+input: "凌晨1点写周报"
+expect:
+  reminder_time: "01:00"
+  title_contains: "写周报"
+tags: [zh, time-only]
