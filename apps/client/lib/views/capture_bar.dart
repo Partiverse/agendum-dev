@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:agendum_nlp/agendum_nlp.dart';
@@ -32,7 +34,7 @@ class _CaptureBarState extends State<CaptureBar> {
 
   void _submit() {
     if (_controller.value.text.trim().isEmpty) return;
-    widget.store.addFromCapture(_parsed);
+    unawaited(widget.store.addFromCapture(_parsed));
     _controller.clear();
     _onChanged('');
     _focus.requestFocus(); // 连续捕获不打断

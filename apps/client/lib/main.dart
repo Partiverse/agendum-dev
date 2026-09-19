@@ -1,14 +1,29 @@
+import 'package:agendum_db/agendum_db.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'theme.dart';
 import 'views/agendum_shell.dart';
 import 'views/store.dart';
 
-void main() {
-  runApp(AgendumApp(store: TaskStore.withSeed()));
+/// 同步服务端地址(构建期可覆盖:`--dart-define=AGENDUM_SERVER=…`)。
+const _serverBase = String.fromEnvironment(
+  'AGENDUM_SERVER',
+  defaultValue: 'http://localhost:8090',
+);
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final support = await getApplicationSupportDirectory();
+  final store = await TaskStore.open(
+    executor: openNativeFileExecutor('${support.path}/agendum.sqlite3'),
+    seedIfEmpty: true,
+    serverBase: _serverBase,
+  );
+  runApp(AgendumApp(store: store));
 }
 
-/// 样板入口：Things 级质感走查的载体（05 文档 W7–8）。
+/// 客户端入口:Things 级质感走查的载体(05 文档 W7–8)。
 class AgendumApp extends StatelessWidget {
   const AgendumApp({super.key, required this.store});
 

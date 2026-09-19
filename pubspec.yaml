@@ -5,6 +5,7 @@ environment:
   sdk: ^3.10.0
 workspace:
   - packages/domain
+  - packages/db
   - packages/protocol
   - packages/sync
   - packages/nlp
@@ -12,7 +13,6 @@ workspace:
   - apps/demo
   - apps/client
   - tools/eval
-# 暂不入工作区（依赖未落地时加入会破坏解析）：
-#   packages/db      → S05 引入 Drift 后加入
+# 暂不入工作区(依赖未落地时加入会破坏解析):
 #   packages/ui      → 首个组件落地后加入
 #   packages/ai_client / tools/seed → 首个真实代码落地时加入

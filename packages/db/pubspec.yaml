@@ -1,0 +1,25 @@
+name: agendum_db
+description: 程簿本地数据层 —— Drift + SQLite:DDL v1(03 文档 §2)、任务仓库(oplog 写管道)、同步状态与远端 op 应用。
+version: 0.0.1
+publish_to: none
+resolution: workspace
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  agendum_domain:
+    ^0.0.1
+  agendum_nlp:
+    ^0.0.1
+  agendum_protocol:
+    ^0.0.1
+  agendum_sync:
+    ^0.0.1
+  drift: ^2.27.0
+  uuid: ^4.5.0
+
+dev_dependencies:
+  build_runner: ^2.4.0
+  drift_dev: ^2.27.0
+  lints: ^6.0.0
+  test: ^1.25.0
