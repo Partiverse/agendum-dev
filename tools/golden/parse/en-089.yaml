@@ -1,0 +1,7 @@
+id: en-089
+now: "2026-09-19T09:00:00"
+input: "10pm standby mode"
+expect:
+  reminder_time: "22:00"
+  title_contains: "standby mode"
+tags: [en, time, easy, rule_solvable]

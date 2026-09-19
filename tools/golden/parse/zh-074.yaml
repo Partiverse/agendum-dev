@@ -1,0 +1,8 @@
+# 北方口语"明儿"；规则层短语库待补，先回落云端。
+id: zh-074
+now: "2026-09-19T09:00:00"
+input: "明儿交稿"
+expect:
+  due_date: "2026-09-20"
+  title_contains: "交稿"
+tags: [zh, date, dialect, 对抗, colloquial, needs_cloud]

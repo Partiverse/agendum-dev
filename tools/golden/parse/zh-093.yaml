@@ -1,0 +1,8 @@
+id: zh-093
+now: "2026-09-19T09:00:00"
+input: "周五晚上8点聚餐 KTV"
+expect:
+  due_date: "2026-09-25"
+  due_time: "20:00"
+  title_contains: "聚餐"
+tags: [zh, date, time, colloquial, rule_solvable]

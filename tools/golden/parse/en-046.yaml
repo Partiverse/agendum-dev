@@ -1,0 +1,7 @@
+id: en-046
+now: "2026-09-19T09:00:00"
+input: "1.5 hr review draft"
+expect:
+  estimate_minutes: 90
+  title_contains: "review draft"
+tags: [en, duration, easy, rule_solvable]

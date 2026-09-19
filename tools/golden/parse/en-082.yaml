@@ -1,0 +1,7 @@
+id: en-082
+now: "2026-09-19T09:00:00"
+input: "in 1 day pay utility bill"
+expect:
+  due_date: "2026-09-20"
+  title_contains: "utility bill"
+tags: [en, date, easy, rule_solvable]

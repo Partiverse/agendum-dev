@@ -1,0 +1,7 @@
+id: en-113
+now: "2026-09-19T09:00:00"
+input: "sort socks before guests come !low"
+expect:
+  energy: low
+  title_contains: "sort socks"
+tags: [en, energy, colloquial, rule_solvable]

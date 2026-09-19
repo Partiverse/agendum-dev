@@ -1,0 +1,8 @@
+id: en-083
+now: "2026-09-19T09:00:00"
+input: "friday 21:00 callback"
+expect:
+  due_date: "2026-09-25"
+  due_time: "21:00"
+  title_exact: "callback"
+tags: [en, date, time, easy, rule_solvable]

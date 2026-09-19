@@ -1,0 +1,8 @@
+id: en-110
+now: "2026-09-19T09:00:00"
+input: "9:15 or 9:45 wake up"
+expect:
+  reminder_time: "09:15"
+  ambiguities_min: 1
+  title_contains: "wake up"
+tags: [en, time, ambiguous, rule_solvable]

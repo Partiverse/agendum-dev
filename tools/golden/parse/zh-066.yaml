@@ -1,0 +1,14 @@
+# 负期望：纯动作短语，所有结构化字段应留空。
+id: zh-066
+now: "2026-09-19T09:00:00"
+input: "处理收件箱"
+expect:
+  due_date: null
+  due_time: null
+  reminder_time: null
+  estimate_minutes: null
+  energy: null
+  project_hint: null
+  tags: null
+  title_exact: "处理收件箱"
+tags: [zh, plain, easy, negative, rule_solvable]

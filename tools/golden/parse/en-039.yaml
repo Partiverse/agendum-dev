@@ -1,0 +1,8 @@
+# 英文数字词 "two hours"；规则层不解析。
+id: en-039
+now: "2026-09-19T09:00:00"
+input: "two hours gardening"
+expect:
+  estimate_minutes: 120
+  title_exact: "gardening"
+tags: [en, duration, colloquial, 对抗, needs_cloud]

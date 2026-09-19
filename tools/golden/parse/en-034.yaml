@@ -1,0 +1,7 @@
+id: en-034
+now: "2026-09-19T09:00:00"
+input: "11:45pm airport pickup"
+expect:
+  reminder_time: "23:45"
+  title_exact: "airport pickup"
+tags: [en, time, easy, rule_solvable]

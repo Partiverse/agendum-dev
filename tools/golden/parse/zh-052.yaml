@@ -1,0 +1,7 @@
+id: zh-052
+now: "2026-09-19T09:00:00"
+input: "90min 复盘写作"
+expect:
+  estimate_minutes: 90
+  title_contains: "复盘写作"
+tags: [zh, duration, easy, rule_solvable]

@@ -1,0 +1,10 @@
+id: zh-068
+now: "2026-09-19T09:00:00"
+input: "给妈妈打电话"
+expect:
+  due_date: null
+  reminder_time: null
+  estimate_minutes: null
+  energy: null
+  title_exact: "给妈妈打电话"
+tags: [zh, plain, easy, negative, rule_solvable]

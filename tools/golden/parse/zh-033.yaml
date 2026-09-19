@@ -1,0 +1,7 @@
+id: zh-033
+now: "2026-09-19T09:00:00"
+input: "10/8 复诊"
+expect:
+  due_date: "2026-10-08"
+  title_exact: "复诊"
+tags: [zh, date, easy, rule_solvable]

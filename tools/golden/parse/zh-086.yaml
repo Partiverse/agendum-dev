@@ -1,0 +1,9 @@
+id: zh-086
+now: "2026-09-19T09:00:00"
+input: "明天晚上7点半小时复盘"
+expect:
+  due_date: "2026-09-20"
+  due_time: "19:00"
+  estimate_minutes: 30
+  title_exact: "复盘"
+tags: [zh, date, time, duration, easy, rule_solvable]

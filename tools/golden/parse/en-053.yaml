@@ -1,0 +1,8 @@
+# 非法日期 25/12（月>12）：不得静默滚日历，应回落并提示。
+id: en-053
+now: "2026-09-19T09:00:00"
+input: "25/12 christmas dinner"
+expect:
+  due_date: "2026-12-25"
+  title_contains: "christmas dinner"
+tags: [en, date, ambiguous, 对抗, needs_cloud]

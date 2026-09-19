@@ -1,0 +1,7 @@
+id: zh-073
+now: "2026-09-16T09:00:00"
+input: "礼拜天早上陪爸妈喝茶"
+expect:
+  due_date: "2026-09-20"
+  title_contains: "陪爸妈喝茶"
+tags: [zh, date, colloquial, rule_solvable]

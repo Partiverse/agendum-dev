@@ -1,0 +1,7 @@
+id: zh-080
+now: "2026-09-19T09:00:00"
+input: "下下周三交论文初稿"
+expect:
+  due_date: "2026-09-30"
+  title_contains: "交论文初稿"
+tags: [zh, date, easy, rule_solvable]

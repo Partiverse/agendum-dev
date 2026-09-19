@@ -1,0 +1,8 @@
+id: zh-096
+now: "2026-09-19T09:00:00"
+input: "#紧急 修水管 !高"
+expect:
+  tags: [紧急]
+  energy: high
+  title_exact: "修水管"
+tags: [zh, energy, tag, easy, rule_solvable]

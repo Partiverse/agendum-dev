@@ -1,0 +1,7 @@
+id: zh-057
+now: "2026-09-19T09:00:00"
+input: "准备演讲 !high"
+expect:
+  energy: high
+  title_exact: "准备演讲"
+tags: [zh, energy, easy, rule_solvable]

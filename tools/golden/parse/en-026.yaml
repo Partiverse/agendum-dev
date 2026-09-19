@@ -1,0 +1,8 @@
+# 拼写错误（tommorow）；应容错或回落云端。
+id: en-026
+now: "2026-09-19T09:00:00"
+input: "tommorow submit visa form"
+expect:
+  due_date: "2026-09-20"
+  title_contains: "visa form"
+tags: [en, date, typo, 对抗, needs_cloud]

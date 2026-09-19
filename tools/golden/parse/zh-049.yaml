@@ -1,0 +1,7 @@
+id: zh-049
+now: "2026-09-19T09:00:00"
+input: "早上8点晨跑5公里"
+expect:
+  reminder_time: "08:00"
+  title_contains: "晨跑5公里"
+tags: [zh, time, easy, rule_solvable]

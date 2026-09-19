@@ -1,0 +1,7 @@
+id: en-042
+now: "2026-09-19T09:00:00"
+input: "tmr buy milk"
+expect:
+  due_date: "2026-09-20"
+  title_exact: "buy milk"
+tags: [en, date, colloquial, rule_solvable]

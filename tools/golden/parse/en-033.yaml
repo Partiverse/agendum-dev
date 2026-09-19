@@ -1,0 +1,8 @@
+# "eod" 习语截止；云端/系统层可解释为今日下班前。
+id: en-033
+now: "2026-09-19T09:00:00"
+input: "eod send invoice"
+expect:
+  due_date: "2026-09-19"
+  title_contains: "send invoice"
+tags: [en, date, colloquial, 对抗, needs_system_model]

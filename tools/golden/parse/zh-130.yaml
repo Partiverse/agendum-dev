@@ -1,0 +1,9 @@
+id: zh-130
+now: "2026-09-19T09:00:00"
+input: "@摄影 整理照片 #爱好 半小时"
+expect:
+  project_hint: "摄影"
+  tags: [爱好]
+  estimate_minutes: 30
+  title_contains: "整理照片"
+tags: [zh, project, tag, duration, easy, rule_solvable]

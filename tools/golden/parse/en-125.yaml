@@ -1,0 +1,7 @@
+id: en-125
+now: "2026-09-19T09:00:00"
+input: "maybe !high? draft proposal"
+expect:
+  energy: high
+  title_contains: "draft proposal"
+tags: [en, energy, ambiguous, rule_solvable]

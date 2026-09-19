@@ -16,8 +16,14 @@
 ///   title_contains: "给司机发合同"
 ///   title_exact: "给司机发合同"
 ///   ambiguities_min: 1
-/// tags: [zh, date]
+///   is_deadline: true
+///   # 负期望：值为 null 表示该字段"应留空"（防止过度填充）
+///   due_date: null
+/// tags: [zh, date, rule_solvable]
 /// ```
+///
+/// 分层标签（04 文档 §4 / 05 文档 §2）：`rule_solvable` / `needs_system_model`
+/// / `needs_cloud`；对抗样例加 `对抗`。回归时按层报告准确率。
 library;
 
 import 'dart:io';
@@ -61,6 +67,7 @@ final class EvalReport {
     required this.passedCases,
     required this.fieldStats,
     required this.failures,
+    required this.caseResults,
   });
 
   final String adapterName;
@@ -69,7 +76,31 @@ final class EvalReport {
   final Map<String, FieldStat> fieldStats;
   final List<String> failures;
 
+  /// 逐用例结果（分层报告用）。
+  final List<CaseResult> caseResults;
+
   double get caseAccuracy => totalCases == 0 ? 1 : passedCases / totalCases;
+
+  /// 按标签聚合的用例级通过率（只统计带该标签的用例）。
+  Map<String, double> accuracyByTag() {
+    final hit = <String, int>{};
+    final total = <String, int>{};
+    for (final r in caseResults) {
+      for (final t in r.tags) {
+        total[t] = (total[t] ?? 0) + 1;
+        if (r.passed) hit[t] = (hit[t] ?? 0) + 1;
+      }
+    }
+    return {for (final e in total.entries) e.key: (hit[e.key] ?? 0) / e.value};
+  }
+}
+
+final class CaseResult {
+  CaseResult({required this.caseId, required this.tags, required this.passed});
+
+  final String caseId;
+  final List<String> tags;
+  final bool passed;
 }
 
 /// 从目录加载 `*.yaml` 用例；目录为空或字段缺失抛 FormatException。
@@ -129,6 +160,7 @@ EvalReport runEval(List<EvalCase> cases, CaptureAdapter adapter) {
   final stats = <String, FieldStat>{};
   var passed = 0;
   final failures = <String>[];
+  final caseResults = <CaseResult>[];
   for (final c in cases) {
     final r = adapter.parse(c.input, c.now);
     var allOk = true;
@@ -142,6 +174,7 @@ EvalReport runEval(List<EvalCase> cases, CaptureAdapter adapter) {
         allOk = false;
       }
     }
+    caseResults.add(CaseResult(caseId: c.id, tags: c.tags, passed: allOk));
     if (allOk) {
       passed++;
     } else {
@@ -154,22 +187,39 @@ EvalReport runEval(List<EvalCase> cases, CaptureAdapter adapter) {
     passedCases: passed,
     fieldStats: stats,
     failures: failures,
+    caseResults: caseResults,
   );
 }
 
-bool _check(String field, Object? expected, ParsedCapture r) => switch (field) {
-  'due_date' => _epochDay(expected as String) == r.dueDay,
-  'due_time' => _hm(r.dueAtMs) == expected,
-  'reminder_time' => _hm(r.reminderAtMs) == expected,
-  'estimate_minutes' => r.estimateMinutes == (expected as num).toInt(),
-  'energy' => r.energy == expected,
-  'tags' => _listEquals(expected as List<Object?>, r.tags),
-  'project_hint' => r.projectHint == expected,
-  'title_contains' => r.title.contains(expected as String),
-  'title_exact' => r.title == expected,
-  'ambiguities_min' => r.ambiguities.length >= (expected as num).toInt(),
-  _ => throw FormatException('未知 expect 字段: $field'),
-};
+/// 负期望：期望值为 null 表示该字段应留空（05 文档 §2"防止过度填充"）。
+bool _check(String field, Object? expected, ParsedCapture r) {
+  if (expected == null) {
+    return switch (field) {
+      'due_date' => r.dueDay == null,
+      'due_time' => r.dueAtMs == null,
+      'reminder_time' => r.reminderAtMs == null,
+      'estimate_minutes' => r.estimateMinutes == null,
+      'energy' => r.energy == null,
+      'project_hint' => r.projectHint == null,
+      'tags' => r.tags.isEmpty,
+      _ => throw FormatException('expect 字段不支持负期望: $field'),
+    };
+  }
+  return switch (field) {
+    'due_date' => _epochDay(expected as String) == r.dueDay,
+    'due_time' => _hm(r.dueAtMs) == expected,
+    'reminder_time' => _hm(r.reminderAtMs) == expected,
+    'estimate_minutes' => r.estimateMinutes == (expected as num).toInt(),
+    'energy' => r.energy == expected,
+    'tags' => _listEquals(expected as List<Object?>, r.tags),
+    'project_hint' => r.projectHint == expected,
+    'title_contains' => r.title.contains(expected as String),
+    'title_exact' => r.title == expected,
+    'ambiguities_min' => r.ambiguities.length >= (expected as num).toInt(),
+    'is_deadline' => r.isDeadline == (expected as bool),
+    _ => throw FormatException('未知 expect 字段: $field'),
+  };
+}
 
 bool _listEquals(List<Object?> a, List<Object?> b) {
   final sa = a.map((e) => e.toString()).toList()..sort();

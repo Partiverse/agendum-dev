@@ -1,0 +1,7 @@
+id: zh-089
+now: "2026-09-19T09:00:00"
+input: "凌晨2点改方案"
+expect:
+  reminder_time: "02:00"
+  title_exact: "改方案"
+tags: [zh, time, easy, rule_solvable]

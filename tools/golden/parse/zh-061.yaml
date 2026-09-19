@@ -1,0 +1,7 @@
+id: zh-061
+now: "2026-09-19T09:00:00"
+input: "#医疗#体检报告 复查眼睛"
+expect:
+  tags: [医疗, 体检报告]
+  title_contains: "复查眼睛"
+tags: [zh, tag, colloquial, rule_solvable]

@@ -1,0 +1,8 @@
+id: en-056
+now: "2026-09-19T09:00:00"
+input: "urgent: fix leak !high #home"
+expect:
+  energy: high
+  tags: [home]
+  title_contains: "fix leak"
+tags: [en, energy, tag, easy, rule_solvable]

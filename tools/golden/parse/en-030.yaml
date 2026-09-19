@@ -1,0 +1,9 @@
+# 时间区间 "9-10am"：应取起点并记歧义。
+id: en-030
+now: "2026-09-19T09:00:00"
+input: "9-10am window delivery"
+expect:
+  reminder_time: "09:00"
+  ambiguities_min: 1
+  title_contains: "window delivery"
+tags: [en, time, ambiguous, 对抗, needs_cloud]

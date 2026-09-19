@@ -1,0 +1,8 @@
+id: en-086
+now: "2026-09-19T09:00:00"
+input: "sprint planning next mon 9:30am"
+expect:
+  due_date: "2026-09-21"
+  due_time: "09:30"
+  title_contains: "sprint planning"
+tags: [en, date, time, easy, rule_solvable]

@@ -1,0 +1,8 @@
+# 噪音："yesterday" 过去时表述不解析日期，仅保留标题。
+id: en-075
+now: "2026-09-19T09:00:00"
+input: "yesterday's followup email"
+expect:
+  due_date: null
+  title_exact: "yesterday's followup email"
+tags: [en, plain, ambiguous, 对抗, noise, rule_solvable]

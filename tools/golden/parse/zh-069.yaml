@@ -1,0 +1,9 @@
+# 无动词名词短语：仅作标题保留，不猜字段。
+id: zh-069
+now: "2026-09-19T09:00:00"
+input: "物业费"
+expect:
+  due_date: null
+  estimate_minutes: null
+  title_exact: "物业费"
+tags: [zh, plain, ambiguous, 对抗, rule_solvable]

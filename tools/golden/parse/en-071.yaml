@@ -1,0 +1,7 @@
+id: en-071
+now: "2026-09-16T09:00:00"
+input: "sat bbq party"
+expect:
+  due_date: "2026-09-19"
+  title_contains: "bbq party"
+tags: [en, date, easy, rule_solvable]

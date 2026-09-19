@@ -1,0 +1,7 @@
+id: zh-097
+now: "2026-09-19T09:00:00"
+input: "@写作 灵感速记"
+expect:
+  project_hint: "写作"
+  title_exact: "灵感速记"
+tags: [zh, project, easy, rule_solvable]

@@ -1,0 +1,8 @@
+id: zh-028
+now: "2026-09-19T09:00:00"
+input: "明日下午2点和设计师对稿"
+expect:
+  due_date: "2026-09-20"
+  due_time: "14:00"
+  title_exact: "和设计师对稿"
+tags: [zh, date, time, easy, rule_solvable]

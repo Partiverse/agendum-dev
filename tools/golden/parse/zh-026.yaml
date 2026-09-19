@@ -1,7 +1,7 @@
 id: zh-026
 now: "2026-09-19T09:00:00"
-input: "晚上9点健身"
+input: "今天买咖啡豆"
 expect:
-  reminder_time: "21:00"
-  title_exact: "健身"
-tags: [zh, time-only]
+  due_date: "2026-09-19"
+  title_exact: "买咖啡豆"
+tags: [zh, date, easy, rule_solvable]

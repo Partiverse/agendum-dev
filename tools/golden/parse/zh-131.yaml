@@ -1,0 +1,7 @@
+id: zh-131
+now: "2026-09-19T09:00:00"
+input: "先来 !低 的:收拾阳台"
+expect:
+  energy: low
+  title_contains: "收拾阳台"
+tags: [zh, energy, ambiguous, rule_solvable]

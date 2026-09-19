@@ -1,0 +1,8 @@
+id: zh-100
+now: "2026-09-19T09:00:00"
+input: "下周四 14:30 视频面试"
+expect:
+  due_date: "2026-09-24"
+  due_time: "14:30"
+  title_exact: "视频面试"
+tags: [zh, date, time, easy, rule_solvable]

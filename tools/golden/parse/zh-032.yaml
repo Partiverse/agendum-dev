@@ -1,0 +1,8 @@
+id: zh-032
+now: "2026-09-19T09:00:00"
+input: "1月15日报税"
+expect:
+  due_date: "2027-01-15"
+  ambiguities_min: 1
+  title_contains: "报税"
+tags: [zh, date, ambiguous, rule_solvable]

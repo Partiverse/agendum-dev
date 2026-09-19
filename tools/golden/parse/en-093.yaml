@@ -1,0 +1,7 @@
+id: en-093
+now: "2026-09-19T09:00:00"
+input: "3:30pm pickup kids"
+expect:
+  reminder_time: "15:30"
+  title_contains: "pickup kids"
+tags: [en, time, colloquial, rule_solvable]

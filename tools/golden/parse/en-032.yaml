@@ -1,0 +1,8 @@
+# "this weekend" 模糊区间；系统模型可按本周末（周六）解释。
+id: en-032
+now: "2026-09-16T09:00:00"
+input: "this weekend clean garage"
+expect:
+  due_date: "2026-09-19"
+  title_contains: "clean garage"
+tags: [en, date, ambiguous, needs_system_model]

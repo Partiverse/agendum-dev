@@ -1,0 +1,8 @@
+# 重复规则 "every monday"：v0 无重复字段，应回落澄清。
+id: en-031
+now: "2026-09-19T09:00:00"
+input: "every monday water plants"
+expect:
+  due_date: "2026-09-21"
+  title_contains: "water plants"
+tags: [en, date, colloquial, 对抗, needs_cloud]

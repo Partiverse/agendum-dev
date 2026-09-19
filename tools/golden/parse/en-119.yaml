@@ -1,0 +1,7 @@
+id: en-119
+now: "2026-09-19T09:00:00"
+input: "moving @storage or @donation boxes"
+expect:
+  project_hint: "storage"
+  title_contains: "donation"
+tags: [en, project, ambiguous, rule_solvable]

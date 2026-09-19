@@ -1,0 +1,7 @@
+id: zh-085
+now: "2026-09-19T09:00:00"
+input: "晚上7点30分家庭会议"
+expect:
+  reminder_time: "19:30"
+  title_exact: "家庭会议"
+tags: [zh, time, easy, rule_solvable]

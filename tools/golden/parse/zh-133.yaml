@@ -1,0 +1,8 @@
+# 双项目歧义：取第一个命中，其余文本保留在标题（v0 行为记录）。
+id: zh-133
+now: "2026-09-19T09:00:00"
+input: "@张三还是@李四 谈合作"
+expect:
+  project_hint: "张三还是"
+  title_contains: "李四"
+tags: [zh, project, ambiguous, 对抗, rule_solvable]

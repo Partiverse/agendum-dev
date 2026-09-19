@@ -1,0 +1,8 @@
+id: zh-119
+now: "2026-09-19T09:00:00"
+input: "周会纪要 #work @项目周会"
+expect:
+  tags: [work]
+  project_hint: "项目周会"
+  title_contains: "周会纪要"
+tags: [zh, tag, project, easy, rule_solvable]

@@ -1,0 +1,8 @@
+id: zh-088
+now: "2026-09-19T09:00:00"
+input: "@健康 每天走路30分钟"
+expect:
+  project_hint: "健康"
+  estimate_minutes: 30
+  title_contains: "每天走路"
+tags: [zh, duration, project, easy, rule_solvable]

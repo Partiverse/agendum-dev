@@ -1,0 +1,8 @@
+id: zh-117
+now: "2026-09-19T09:00:00"
+input: "回复邮件 !高精力 15分钟"
+expect:
+  energy: high
+  estimate_minutes: 15
+  title_contains: "回复邮件"
+tags: [zh, energy, duration, easy, rule_solvable]

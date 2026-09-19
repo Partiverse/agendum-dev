@@ -1,0 +1,8 @@
+id: zh-042
+now: "2026-09-19T09:00:00"
+input: "上午10点到11点开评审会"
+expect:
+  reminder_time: "10:00"
+  ambiguities_min: 1
+  title_contains: "开评审会"
+tags: [zh, time, ambiguous, 对抗, rule_solvable]

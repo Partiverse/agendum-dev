@@ -1,0 +1,8 @@
+# "midnight" 习语时刻；规则层 v0 不支持。
+id: en-109
+now: "2026-09-19T09:00:00"
+input: "midnight meditate"
+expect:
+  reminder_time: "00:00"
+  title_contains: "meditate"
+tags: [en, time, colloquial, 对抗, needs_cloud]

@@ -1,0 +1,8 @@
+id: en-094
+now: "2026-09-19T09:00:00"
+input: "around 7pm or 8pm dinner"
+expect:
+  reminder_time: "19:00"
+  ambiguities_min: 1
+  title_contains: "dinner"
+tags: [en, time, ambiguous, 对抗, rule_solvable]

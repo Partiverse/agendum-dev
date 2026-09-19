@@ -1,0 +1,8 @@
+id: en-104
+now: "2026-09-19T09:00:00"
+input: "friday evening team dinner"
+expect:
+  due_date: "2026-09-25"
+  reminder_time: null
+  title_contains: "team dinner"
+tags: [en, date, time, colloquial, rule_solvable]

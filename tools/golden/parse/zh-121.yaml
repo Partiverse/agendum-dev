@@ -1,0 +1,8 @@
+id: zh-121
+now: "2026-09-19T09:00:00"
+input: "@装修 和工长对水电图 2小时"
+expect:
+  project_hint: "装修"
+  estimate_minutes: 120
+  title_contains: "和工长对水电图"
+tags: [zh, project, duration, colloquial, rule_solvable]

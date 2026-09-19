@@ -1,0 +1,8 @@
+id: en-066
+now: "2026-09-19T09:00:00"
+input: "mon 9am dentist followup"
+expect:
+  due_date: "2026-09-21"
+  due_time: "09:00"
+  title_contains: "dentist followup"
+tags: [en, date, time, easy, rule_solvable]

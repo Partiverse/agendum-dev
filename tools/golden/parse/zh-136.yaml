@@ -1,0 +1,7 @@
+id: zh-136
+now: "2026-09-19T09:00:00"
+input: "20分钟午睡"
+expect:
+  estimate_minutes: 20
+  title_exact: "午睡"
+tags: [zh, duration, colloquial, rule_solvable]

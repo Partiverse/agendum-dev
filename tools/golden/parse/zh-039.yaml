@@ -1,0 +1,9 @@
+# 规则层缺口：v0 未覆盖"明早"（应按明天解析）。规则层命中率低时优先补短语库。
+id: zh-039
+now: "2026-09-19T09:00:00"
+input: "明早9点晨会"
+expect:
+  due_date: "2026-09-20"
+  due_time: "09:00"
+  title_exact: "晨会"
+tags: [zh, date, time, colloquial, rule_solvable]

@@ -1,0 +1,7 @@
+id: zh-034
+now: "2026-09-19T09:00:00"
+input: "15天后提交签证材料"
+expect:
+  due_date: "2026-10-04"
+  title_contains: "提交签证材料"
+tags: [zh, date, easy, rule_solvable]

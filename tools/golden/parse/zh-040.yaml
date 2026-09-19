@@ -1,0 +1,7 @@
+id: zh-040
+now: "2026-09-19T09:00:00"
+input: "中午12点吃药"
+expect:
+  reminder_time: "12:00"
+  title_exact: "吃药"
+tags: [zh, time, easy, rule_solvable]

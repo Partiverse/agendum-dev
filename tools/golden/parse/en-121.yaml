@@ -1,0 +1,7 @@
+id: en-121
+now: "2026-09-19T09:00:00"
+input: "shower at 7am sharp"
+expect:
+  reminder_time: "07:00"
+  title_contains: "shower"
+tags: [en, time, colloquial, rule_solvable]

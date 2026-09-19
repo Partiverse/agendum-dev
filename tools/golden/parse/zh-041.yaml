@@ -1,0 +1,7 @@
+id: zh-041
+now: "2026-09-19T09:00:00"
+input: "傍晚6点半遛狗"
+expect:
+  reminder_time: "18:30"
+  title_exact: "遛狗"
+tags: [zh, time, colloquial, rule_solvable]

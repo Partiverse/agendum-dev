@@ -1,0 +1,7 @@
+id: en-098
+now: "2026-09-19T09:00:00"
+input: "#family book flights #travel"
+expect:
+  tags: [family, travel]
+  title_contains: "book flights"
+tags: [en, tag, colloquial, rule_solvable]

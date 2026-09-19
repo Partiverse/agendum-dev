@@ -1,0 +1,7 @@
+id: zh-115
+now: "2026-09-19T09:00:00"
+input: "半小时还是45分钟打扫"
+expect:
+  estimate_minutes: 30
+  title_contains: "打扫"
+tags: [zh, duration, ambiguous, rule_solvable]

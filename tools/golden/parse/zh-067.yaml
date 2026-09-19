@@ -1,0 +1,9 @@
+# "下午"无具体时刻，不得过度填充为提醒。
+id: zh-067
+now: "2026-09-19T09:00:00"
+input: "下午去银行办卡"
+expect:
+  due_date: null
+  reminder_time: null
+  title_exact: "下午去银行办卡"
+tags: [zh, time, easy, negative, rule_solvable]

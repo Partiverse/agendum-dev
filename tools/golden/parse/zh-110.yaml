@@ -1,0 +1,9 @@
+# 噪音输入：模糊表述整体保留为标题，不猜字段。
+id: zh-110
+now: "2026-09-19T09:00:00"
+input: "晚上不知道几点 先记着 去修车"
+expect:
+  due_date: null
+  reminder_time: null
+  title_exact: "晚上不知道几点 先记着 去修车"
+tags: [zh, plain, ambiguous, 对抗, noise, rule_solvable]

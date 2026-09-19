@@ -1,0 +1,7 @@
+id: en-106
+now: "2026-09-19T09:00:00"
+input: "40 mins write weekly review"
+expect:
+  estimate_minutes: 40
+  title_contains: "write weekly review"
+tags: [en, duration, colloquial, rule_solvable]

@@ -1,0 +1,7 @@
+id: en-055
+now: "2026-09-19T09:00:00"
+input: "buy milk and bread"
+expect:
+  due_date: null
+  title_exact: "buy milk and bread"
+tags: [en, plain, easy, rule_solvable]

@@ -1,0 +1,7 @@
+id: zh-099
+now: "2026-09-19T09:00:00"
+input: "10点15分接孩子"
+expect:
+  reminder_time: "10:15"
+  title_exact: "接孩子"
+tags: [zh, time, easy, rule_solvable]

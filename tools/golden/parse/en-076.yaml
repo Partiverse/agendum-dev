@@ -1,0 +1,10 @@
+id: en-076
+now: "2026-09-19T09:00:00"
+input: "tomorrow buy groceries !high #shopping @home-plan"
+expect:
+  due_date: "2026-09-20"
+  energy: high
+  tags: [shopping]
+  project_hint: "home-plan"
+  title_exact: "buy groceries"
+tags: [en, date, energy, tag, project, easy, rule_solvable]

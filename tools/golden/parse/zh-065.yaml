@@ -1,0 +1,11 @@
+id: zh-065
+now: "2026-09-19T09:00:00"
+input: "明天上午10点站会 30min #工作 @程簿"
+expect:
+  due_date: "2026-09-20"
+  due_time: "10:00"
+  estimate_minutes: 30
+  tags: [工作]
+  project_hint: "程簿"
+  title_exact: "站会"
+tags: [zh, date, time, duration, tag, project, easy, rule_solvable]

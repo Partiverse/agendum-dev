@@ -1,0 +1,7 @@
+id: en-013
+now: "2026-09-19T09:00:00"
+input: "3 hr code review"
+expect:
+  estimate_minutes: 180
+  title_contains: "code review"
+tags: [en, duration, easy, rule_solvable]

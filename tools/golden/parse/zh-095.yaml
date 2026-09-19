@@ -1,0 +1,8 @@
+# 口语"一小时"；规则层 v0 不支持中文数字。
+id: zh-095
+now: "2026-09-19T09:00:00"
+input: "一小时写代码"
+expect:
+  estimate_minutes: 60
+  title_contains: "写代码"
+tags: [zh, duration, colloquial, 对抗, needs_system_model]

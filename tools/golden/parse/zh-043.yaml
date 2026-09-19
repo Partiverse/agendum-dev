@@ -1,0 +1,8 @@
+id: zh-043
+now: "2026-09-19T09:00:00"
+input: "10月1日上午9点看阅兵直播"
+expect:
+  due_date: "2026-10-01"
+  due_time: "09:00"
+  title_exact: "看阅兵直播"
+tags: [zh, date, time, easy, rule_solvable]

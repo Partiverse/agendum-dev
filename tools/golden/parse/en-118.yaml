@@ -1,0 +1,8 @@
+# 等待某人（GTD waiting-for 常用 @人名路由）。
+id: en-118
+now: "2026-09-19T09:00:00"
+input: "check with @alice about venue"
+expect:
+  project_hint: "alice"
+  title_contains: "about venue"
+tags: [en, project, colloquial, rule_solvable]

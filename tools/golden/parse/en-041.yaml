@@ -1,0 +1,8 @@
+# 当天说"周六"→按今天（含今日的最近匹配）。
+id: en-041
+now: "2026-09-19T09:00:00"
+input: "saturday hike with tom"
+expect:
+  due_date: "2026-09-19"
+  title_contains: "hike with tom"
+tags: [en, date, ambiguous, rule_solvable]

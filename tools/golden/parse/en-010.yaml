@@ -1,0 +1,7 @@
+id: en-010
+now: "2026-09-19T09:00:00"
+input: "10/12 file taxes"
+expect:
+  due_date: "2026-10-12"
+  title_exact: "file taxes"
+tags: [en, date, easy, rule_solvable]

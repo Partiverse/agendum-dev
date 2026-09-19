@@ -1,0 +1,7 @@
+id: zh-135
+now: "2026-09-19T09:00:00"
+input: "#运动 晨跑打卡"
+expect:
+  tags: [运动]
+  title_contains: "晨跑打卡"
+tags: [zh, tag, easy, rule_solvable]

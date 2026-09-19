@@ -1,0 +1,8 @@
+# 噪音：感叹号紧跟名词，不得误判为精力标记。
+id: en-048
+now: "2026-09-19T09:00:00"
+input: "buy !milk"
+expect:
+  energy: null
+  title_exact: "buy !milk"
+tags: [en, plain, ambiguous, 对抗, noise, rule_solvable]

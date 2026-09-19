@@ -1,0 +1,8 @@
+# 口语数字词（"俩"）；规则层不解析中文数字。
+id: zh-055
+now: "2026-09-19T09:00:00"
+input: "俩小时打球"
+expect:
+  estimate_minutes: 120
+  title_exact: "打球"
+tags: [zh, duration, dialect, 对抗, colloquial, needs_cloud]

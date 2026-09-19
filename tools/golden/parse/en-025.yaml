@@ -1,0 +1,8 @@
+# "next next friday" 英语口语叠用；规则层 v0 不支持。
+id: en-025
+now: "2026-09-19T09:00:00"
+input: "next next friday audit prep"
+expect:
+  due_date: "2026-10-02"
+  title_contains: "audit prep"
+tags: [en, date, ambiguous, 对抗, needs_cloud]

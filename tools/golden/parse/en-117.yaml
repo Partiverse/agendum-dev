@@ -1,0 +1,7 @@
+id: en-117
+now: "2026-09-19T09:00:00"
+input: "@home assemble shelf"
+expect:
+  project_hint: "home"
+  title_contains: "assemble shelf"
+tags: [en, project, easy, rule_solvable]

@@ -1,0 +1,7 @@
+id: en-058
+now: "2026-09-19T09:00:00"
+input: "next sunday roast dinner"
+expect:
+  due_date: "2026-09-27"
+  title_contains: "roast dinner"
+tags: [en, date, easy, rule_solvable]

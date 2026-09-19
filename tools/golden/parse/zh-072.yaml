@@ -1,0 +1,9 @@
+# 错别字（下于≈下午）："3点"不应误判为凌晨3点，应回落云端。
+id: zh-072
+now: "2026-09-19T09:00:00"
+input: "后天下于3点取票据"
+expect:
+  due_date: "2026-09-21"
+  due_time: "15:00"
+  title_exact: "取票据"
+tags: [zh, date, time, typo, 对抗, needs_cloud]

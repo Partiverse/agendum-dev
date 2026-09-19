@@ -1,0 +1,8 @@
+id: en-096
+now: "2026-09-19T09:00:00"
+input: "light errands !low 20 mins"
+expect:
+  energy: low
+  estimate_minutes: 20
+  title_contains: "light errands"
+tags: [en, energy, duration, colloquial, rule_solvable]

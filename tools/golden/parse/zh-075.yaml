@@ -1,0 +1,8 @@
+id: zh-075
+now: "2026-09-19T09:00:00"
+input: "9月25日或者9月28日交标书"
+expect:
+  due_date: "2026-09-25"
+  ambiguities_min: 1
+  title_contains: "交标书"
+tags: [zh, date, ambiguous, 对抗, rule_solvable]

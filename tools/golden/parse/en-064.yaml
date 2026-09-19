@@ -1,0 +1,8 @@
+id: en-064
+now: "2026-09-19T09:00:00"
+input: "friday drinks with team 2h"
+expect:
+  due_date: "2026-09-25"
+  estimate_minutes: 120
+  title_contains: "drinks with team"
+tags: [en, date, duration, easy, rule_solvable]

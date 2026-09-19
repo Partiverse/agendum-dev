@@ -1,0 +1,8 @@
+# "oct 3" 月份缩写日期：系统检测器（DataDetectors）强项。
+id: en-029
+now: "2026-09-19T09:00:00"
+input: "oct 3 book flights"
+expect:
+  due_date: "2026-10-03"
+  title_contains: "book flights"
+tags: [en, date, easy, needs_system_model]

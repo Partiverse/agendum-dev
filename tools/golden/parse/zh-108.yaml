@@ -1,0 +1,7 @@
+id: zh-108
+now: "2026-09-16T09:00:00"
+input: "礼拜五交房租"
+expect:
+  due_date: "2026-09-18"
+  title_exact: "交房租"
+tags: [zh, date, colloquial, rule_solvable]

@@ -1,0 +1,9 @@
+id: zh-125
+now: "2026-09-19T09:00:00"
+input: "@旅行 订酒店 30min !高"
+expect:
+  project_hint: "旅行"
+  estimate_minutes: 30
+  energy: high
+  title_exact: "订酒店"
+tags: [zh, project, duration, energy, easy, rule_solvable]

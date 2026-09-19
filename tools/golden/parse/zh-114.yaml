@@ -1,0 +1,8 @@
+id: zh-114
+now: "2026-09-19T09:00:00"
+input: "下午3点还是4点装宽带"
+expect:
+  reminder_time: "15:00"
+  ambiguities_min: 1
+  title_contains: "装宽带"
+tags: [zh, time, ambiguous, 对抗, rule_solvable]

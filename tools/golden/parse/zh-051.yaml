@@ -1,0 +1,7 @@
+id: zh-051
+now: "2026-09-19T09:00:00"
+input: "2.5小时备课"
+expect:
+  estimate_minutes: 150
+  title_exact: "备课"
+tags: [zh, duration, easy, rule_solvable]

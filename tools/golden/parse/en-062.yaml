@@ -1,0 +1,7 @@
+id: en-062
+now: "2026-09-19T09:00:00"
+input: "6am jog"
+expect:
+  reminder_time: "06:00"
+  title_exact: "jog"
+tags: [en, time, easy, rule_solvable]

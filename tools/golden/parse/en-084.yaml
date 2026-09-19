@@ -1,0 +1,8 @@
+id: en-084
+now: "2026-09-19T09:00:00"
+input: "next fri happy hour 1.5h"
+expect:
+  due_date: "2026-09-25"
+  estimate_minutes: 90
+  title_contains: "happy hour"
+tags: [en, date, duration, easy, rule_solvable]

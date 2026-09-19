@@ -1,0 +1,8 @@
+# 中文数字"两点半"；规则层不解析，回落云端/系统模型。
+id: zh-126
+now: "2026-09-19T09:00:00"
+input: "下午两点半取护照"
+expect:
+  reminder_time: "14:30"
+  title_contains: "取护照"
+tags: [zh, time, colloquial, 对抗, needs_cloud]

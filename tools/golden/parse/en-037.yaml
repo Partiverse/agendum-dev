@@ -1,0 +1,7 @@
+id: en-037
+now: "2026-09-19T09:00:00"
+input: "12pm lunch with client"
+expect:
+  reminder_time: "12:00"
+  title_contains: "lunch with client"
+tags: [en, time, easy, rule_solvable]

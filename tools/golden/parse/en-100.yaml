@@ -1,0 +1,7 @@
+id: en-100
+now: "2026-09-19T09:00:00"
+input: "@garden prune roses"
+expect:
+  project_hint: "garden"
+  title_exact: "prune roses"
+tags: [en, project, colloquial, rule_solvable]

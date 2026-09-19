@@ -1,0 +1,7 @@
+id: en-044
+now: "2026-09-19T09:00:00"
+input: "thu water plants"
+expect:
+  due_date: "2026-09-24"
+  title_exact: "water plants"
+tags: [en, date, easy, rule_solvable]

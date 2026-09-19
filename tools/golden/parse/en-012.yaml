@@ -1,0 +1,7 @@
+id: en-012
+now: "2026-09-19T09:00:00"
+input: "45mins inbox zero"
+expect:
+  estimate_minutes: 45
+  title_contains: "inbox zero"
+tags: [en, duration, easy, rule_solvable]

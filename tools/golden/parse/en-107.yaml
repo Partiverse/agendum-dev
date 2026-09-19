@@ -1,0 +1,8 @@
+id: en-107
+now: "2026-09-19T09:00:00"
+input: "some day visit kyoto"
+expect:
+  due_date: null
+  reminder_time: null
+  title_exact: "some day visit kyoto"
+tags: [en, plain, ambiguous, rule_solvable]

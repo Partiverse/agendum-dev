@@ -1,0 +1,7 @@
+id: en-116
+now: "2026-09-19T09:00:00"
+input: "@finance file receipts"
+expect:
+  project_hint: "finance"
+  title_contains: "file receipts"
+tags: [en, project, easy, rule_solvable]

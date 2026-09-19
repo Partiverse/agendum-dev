@@ -1,0 +1,7 @@
+id: zh-046
+now: "2026-09-19T09:00:00"
+input: "周五下班前交周报"
+expect:
+  due_date: "2026-09-25"
+  title_contains: "下班前交周报"
+tags: [zh, date, colloquial, rule_solvable]

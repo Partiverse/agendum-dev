@@ -1,0 +1,7 @@
+id: en-022
+now: "2026-09-19T09:00:00"
+input: "the day after tomorrow return library books"
+expect:
+  due_date: "2026-09-21"
+  title_contains: "return library books"
+tags: [en, date, easy, rule_solvable]

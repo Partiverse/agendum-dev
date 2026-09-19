@@ -1,0 +1,7 @@
+id: zh-120
+now: "2026-09-19T09:00:00"
+input: "@婚礼 确定司仪人选"
+expect:
+  project_hint: "婚礼"
+  title_contains: "确定司仪人选"
+tags: [zh, project, colloquial, rule_solvable]

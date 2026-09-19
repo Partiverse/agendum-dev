@@ -1,0 +1,8 @@
+id: en-097
+now: "2026-09-19T09:00:00"
+input: "#health morning stretch !low"
+expect:
+  tags: [health]
+  energy: low
+  title_contains: "morning stretch"
+tags: [en, tag, energy, easy, rule_solvable]

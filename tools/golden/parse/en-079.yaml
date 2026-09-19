@@ -1,0 +1,8 @@
+id: en-079
+now: "2026-09-19T09:00:00"
+input: "buy 2 bottles of wine"
+expect:
+  estimate_minutes: null
+  due_date: null
+  title_exact: "buy 2 bottles of wine"
+tags: [en, plain, easy, negative, rule_solvable]

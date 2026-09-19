@@ -1,0 +1,7 @@
+id: zh-079
+now: "2026-09-19T09:00:00"
+input: "11月11日 付尾款"
+expect:
+  due_date: "2026-11-11"
+  title_contains: "付尾款"
+tags: [zh, date, easy, rule_solvable]

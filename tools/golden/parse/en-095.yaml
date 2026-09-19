@@ -1,0 +1,7 @@
+id: en-095
+now: "2026-09-19T09:00:00"
+input: "1 or 2 hours for the test"
+expect:
+  estimate_minutes: 120
+  title_contains: "for the test"
+tags: [en, duration, ambiguous, rule_solvable]

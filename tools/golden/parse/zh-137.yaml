@@ -1,0 +1,7 @@
+id: zh-137
+now: "2026-09-19T09:00:00"
+input: "夜里11点熄灯"
+expect:
+  reminder_time: "23:00"
+  title_exact: "熄灯"
+tags: [zh, time, colloquial, rule_solvable]

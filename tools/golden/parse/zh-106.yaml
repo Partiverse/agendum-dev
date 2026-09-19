@@ -1,0 +1,9 @@
+id: zh-106
+now: "2026-09-19T09:00:00"
+input: "@财务 报销单 !低 20分钟"
+expect:
+  project_hint: "财务"
+  energy: low
+  estimate_minutes: 20
+  title_exact: "报销单"
+tags: [zh, duration, energy, project, easy, rule_solvable]

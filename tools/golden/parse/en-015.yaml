@@ -1,0 +1,7 @@
+id: en-015
+now: "2026-09-19T09:00:00"
+input: "prepare slides !HIGH"
+expect:
+  energy: high
+  title_exact: "prepare slides"
+tags: [en, energy, easy, rule_solvable]

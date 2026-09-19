@@ -1,0 +1,8 @@
+id: en-063
+now: "2026-09-19T09:00:00"
+input: "tomorrow 7:30am flu shot"
+expect:
+  due_date: "2026-09-20"
+  due_time: "07:30"
+  title_contains: "flu shot"
+tags: [en, date, time, easy, rule_solvable]

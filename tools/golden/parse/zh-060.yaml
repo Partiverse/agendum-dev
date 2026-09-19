@@ -1,0 +1,7 @@
+id: zh-060
+now: "2026-09-19T09:00:00"
+input: "#工作 每周采购 #生活"
+expect:
+  tags: [工作, 生活]
+  title_contains: "每周采购"
+tags: [zh, tag, easy, rule_solvable]

@@ -1,0 +1,8 @@
+id: en-040
+now: "2026-09-19T09:00:00"
+input: "friday 5pm leave early"
+expect:
+  due_date: "2026-09-25"
+  due_time: "17:00"
+  title_exact: "leave early"
+tags: [en, date, time, easy, rule_solvable]

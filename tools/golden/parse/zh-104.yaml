@@ -1,0 +1,8 @@
+id: zh-104
+now: "2026-09-19T09:00:00"
+input: "9月19日 23:59 交申请表"
+expect:
+  due_date: "2026-09-19"
+  due_time: "23:59"
+  title_contains: "交申请表"
+tags: [zh, date, time, easy, rule_solvable]

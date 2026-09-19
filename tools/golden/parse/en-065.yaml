@@ -1,0 +1,8 @@
+# 连字口语 "half-hour"；规则层 v0 不支持。
+id: en-065
+now: "2026-09-19T09:00:00"
+input: "sort receipts half-hour"
+expect:
+  estimate_minutes: 30
+  title_contains: "sort receipts"
+tags: [en, duration, colloquial, needs_cloud]

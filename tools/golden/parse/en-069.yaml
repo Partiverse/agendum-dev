@@ -1,0 +1,7 @@
+id: en-069
+now: "2026-09-19T09:00:00"
+input: "mom's birthday gift ideas"
+expect:
+  due_date: null
+  title_exact: "mom's birthday gift ideas"
+tags: [en, plain, easy, rule_solvable]

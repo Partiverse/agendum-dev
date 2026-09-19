@@ -1,0 +1,8 @@
+id: en-105
+now: "2026-09-19T09:00:00"
+input: "between 2pm and 3pm drop off parcel"
+expect:
+  reminder_time: "14:00"
+  ambiguities_min: 1
+  title_contains: "drop off parcel"
+tags: [en, time, ambiguous, rule_solvable]

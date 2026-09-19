@@ -1,0 +1,7 @@
+id: zh-139
+now: "2026-09-19T09:00:00"
+input: "深度写作 !高"
+expect:
+  energy: high
+  title_exact: "深度写作"
+tags: [zh, energy, easy, rule_solvable]

@@ -1,0 +1,8 @@
+id: zh-127
+now: "2026-09-19T09:00:00"
+input: "早上10点或10点半约供应商"
+expect:
+  reminder_time: "10:00"
+  ambiguities_min: 1
+  title_contains: "约供应商"
+tags: [zh, time, ambiguous, rule_solvable]

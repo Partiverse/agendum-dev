@@ -1,0 +1,7 @@
+id: zh-029
+now: "2026-09-16T09:00:00"
+input: "礼拜六带孩子看牙"
+expect:
+  due_date: "2026-09-19"
+  title_exact: "带孩子看牙"
+tags: [zh, date, colloquial, rule_solvable]

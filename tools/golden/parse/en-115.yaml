@@ -1,0 +1,7 @@
+id: en-115
+now: "2026-09-19T09:00:00"
+input: "#someday maybe: learn bass"
+expect:
+  tags: [someday]
+  title_contains: "learn bass"
+tags: [en, tag, ambiguous, rule_solvable]

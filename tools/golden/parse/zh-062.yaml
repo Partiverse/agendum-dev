@@ -1,0 +1,7 @@
+id: zh-062
+now: "2026-09-19T09:00:00"
+input: "买菜 #groceries 顺便订机票 #trip-2026"
+expect:
+  tags: [groceries, trip-2026]
+  title_contains: "买菜"
+tags: [zh, tag, easy, rule_solvable]

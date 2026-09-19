@@ -1,0 +1,7 @@
+id: zh-140
+now: "2026-09-19T09:00:00"
+input: "半小时到一个小时散步"
+expect:
+  estimate_minutes: 30
+  title_contains: "散步"
+tags: [zh, duration, ambiguous, rule_solvable]

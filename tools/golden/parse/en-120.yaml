@@ -1,0 +1,7 @@
+id: en-120
+now: "2026-09-19T09:00:00"
+input: "before 9am drop keys"
+expect:
+  reminder_time: "09:00"
+  title_contains: "drop keys"
+tags: [en, time, colloquial, rule_solvable]

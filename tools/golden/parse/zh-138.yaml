@@ -1,0 +1,8 @@
+id: zh-138
+now: "2026-09-19T09:00:00"
+input: "中午12点或1点回复客户"
+expect:
+  reminder_time: "12:00"
+  ambiguities_min: 1
+  title_contains: "回复客户"
+tags: [zh, time, ambiguous, rule_solvable]

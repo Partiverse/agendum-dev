@@ -1,0 +1,8 @@
+# 口语省略"月"（"本月15号"）；规则层 v0 不支持。
+id: zh-082
+now: "2026-09-03T09:00:00"
+input: "本月15号发工资"
+expect:
+  due_date: "2026-09-15"
+  title_contains: "发工资"
+tags: [zh, date, colloquial, 对抗, needs_system_model]

@@ -1,0 +1,10 @@
+id: en-020
+now: "2026-09-19T09:00:00"
+input: "meditate"
+expect:
+  due_date: null
+  reminder_time: null
+  estimate_minutes: null
+  energy: null
+  title_exact: "meditate"
+tags: [en, plain, easy, negative, rule_solvable]

@@ -1,0 +1,7 @@
+id: en-052
+now: "2026-09-19T09:00:00"
+input: "in 2 days call grandma"
+expect:
+  due_date: "2026-09-21"
+  title_contains: "call grandma"
+tags: [en, date, easy, rule_solvable]

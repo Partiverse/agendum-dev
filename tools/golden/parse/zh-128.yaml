@@ -1,0 +1,9 @@
+id: zh-128
+now: "2026-09-19T09:00:00"
+input: "#周末 大扫除 2小时 !低"
+expect:
+  tags: [周末]
+  estimate_minutes: 120
+  energy: low
+  title_contains: "大扫除"
+tags: [zh, tag, duration, energy, easy, rule_solvable]

@@ -1,0 +1,7 @@
+id: en-009
+now: "2026-09-19T09:00:00"
+input: "in 10 days renew passport"
+expect:
+  due_date: "2026-09-29"
+  title_contains: "renew passport"
+tags: [en, date, easy, rule_solvable]

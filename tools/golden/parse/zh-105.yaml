@@ -1,0 +1,7 @@
+id: zh-105
+now: "2026-09-19T09:00:00"
+input: "150min 深度整理收藏夹"
+expect:
+  estimate_minutes: 150
+  title_contains: "深度整理收藏夹"
+tags: [zh, duration, easy, rule_solvable]

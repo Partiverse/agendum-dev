@@ -1,0 +1,11 @@
+id: en-019
+now: "2026-09-19T09:00:00"
+input: "tomorrow 10am standup 30min #work @agendum"
+expect:
+  due_date: "2026-09-20"
+  due_time: "10:00"
+  estimate_minutes: 30
+  tags: [work]
+  project_hint: "agendum"
+  title_exact: "standup"
+tags: [en, date, time, duration, tag, project, easy, rule_solvable]

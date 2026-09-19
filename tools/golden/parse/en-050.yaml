@@ -1,0 +1,8 @@
+# 无冠词 "day after tomorrow"：不得误匹配为 tomorrow。
+id: en-050
+now: "2026-09-19T09:00:00"
+input: "day after tomorrow car inspection"
+expect:
+  due_date: "2026-09-21"
+  title_contains: "car inspection"
+tags: [en, date, ambiguous, 对抗, needs_cloud]

@@ -1,0 +1,8 @@
+# 口语时长 "half an hour"；规则层 v0 不支持。
+id: en-027
+now: "2026-09-19T09:00:00"
+input: "half an hour tidy desk"
+expect:
+  estimate_minutes: 30
+  title_contains: "tidy desk"
+tags: [en, duration, colloquial, 对抗, needs_cloud]

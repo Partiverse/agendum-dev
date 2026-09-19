@@ -1,0 +1,7 @@
+id: zh-087
+now: "2026-09-19T09:00:00"
+input: "生日聚会在9月30日"
+expect:
+  due_date: "2026-09-30"
+  title_contains: "生日聚会"
+tags: [zh, date, colloquial, rule_solvable]

@@ -1,0 +1,7 @@
+id: zh-030
+now: "2026-09-19T09:00:00"
+input: "下下礼拜三 团建"
+expect:
+  due_date: "2026-09-30"
+  title_exact: "团建"
+tags: [zh, date, dialect, 对抗, easy, rule_solvable]

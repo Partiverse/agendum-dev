@@ -70,6 +70,26 @@ Future<void> main(List<String> arguments) async {
     }
   }
 
+  // 分层报告（04 文档 §4：规则层低则优先补规则，而非调提示词）。
+  const layers = ['rule_solvable', 'needs_system_model', 'needs_cloud'];
+  final byTag = report.accuracyByTag();
+  stdout.writeln('分层通过率:');
+  for (final layer in layers) {
+    final n = report.caseResults.where((r) => r.tags.contains(layer)).length;
+    if (n == 0) continue;
+    stdout.writeln(
+      '  ${layer.padRight(20)} ${byTag[layer]!.toStringAsFixed(3)}'
+      ' ($n 例)',
+    );
+  }
+  final adv = report.caseResults.where((r) => r.tags.contains('对抗')).length;
+  if (adv > 0) {
+    stdout.writeln(
+      '  对抗样例              ${byTag['对抗']!.toStringAsFixed(3)}'
+      ' ($adv 例, ${(adv * 100 / report.totalCases).toStringAsFixed(1)}%)',
+    );
+  }
+
   final pass = report.caseAccuracy >= minRate;
   stdout.writeln(
     '门槛 ${((minRate * 100).toStringAsFixed(1))}%: ${pass ? 'PASS' : 'FAIL'}',

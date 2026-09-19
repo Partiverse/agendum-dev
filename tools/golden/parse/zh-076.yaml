@@ -1,0 +1,8 @@
+# 噪音符号（"!!!"非精力标记）：不得误判精力，仅清噪音。
+id: zh-076
+now: "2026-09-19T09:00:00"
+input: "!!! 重要 的事情"
+expect:
+  energy: null
+  title_exact: "重要 的事情"
+tags: [zh, plain, ambiguous, 对抗, noise, rule_solvable]

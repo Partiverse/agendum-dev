@@ -1,0 +1,9 @@
+# 双项目路由：取第一个，第二个应记歧义（v0 未记录 → 已知缺口）。
+id: zh-064
+now: "2026-09-19T09:00:00"
+input: "@A项目 跟进合同 @B项目 对齐排期"
+expect:
+  project_hint: "A项目"
+  ambiguities_min: 1
+  title_contains: "跟进合同"
+tags: [zh, project, ambiguous, 对抗, needs_cloud]

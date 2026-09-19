@@ -1,0 +1,7 @@
+id: en-018
+now: "2026-09-19T09:00:00"
+input: "@website redesign landing page"
+expect:
+  project_hint: "website"
+  title_exact: "redesign landing page"
+tags: [en, project, easy, rule_solvable]

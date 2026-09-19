@@ -1,0 +1,8 @@
+# 错别字（明夫）：日期解析应容错或回落云端。
+id: zh-071
+now: "2026-09-19T09:00:00"
+input: "明夫上午交简历"
+expect:
+  due_date: "2026-09-20"
+  title_contains: "交简历"
+tags: [zh, date, typo, 对抗, colloquial, needs_cloud]

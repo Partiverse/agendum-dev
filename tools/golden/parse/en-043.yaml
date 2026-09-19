@@ -1,0 +1,7 @@
+id: en-043
+now: "2026-09-19T09:00:00"
+input: "next tue dentist appt"
+expect:
+  due_date: "2026-09-22"
+  title_contains: "dentist appt"
+tags: [en, date, easy, rule_solvable]

@@ -1,0 +1,7 @@
+id: en-045
+now: "2026-09-19T09:00:00"
+input: "30 min stretch"
+expect:
+  estimate_minutes: 30
+  title_exact: "stretch"
+tags: [en, duration, easy, rule_solvable]

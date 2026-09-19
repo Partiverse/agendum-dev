@@ -1,0 +1,9 @@
+id: en-103
+now: "2026-09-19T09:00:00"
+input: "#urgent @insurance call about claim 30min"
+expect:
+  tags: [urgent]
+  project_hint: "insurance"
+  estimate_minutes: 30
+  title_contains: "call about claim"
+tags: [en, tag, project, duration, easy, rule_solvable]

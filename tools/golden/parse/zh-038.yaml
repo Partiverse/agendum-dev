@@ -1,0 +1,8 @@
+id: zh-038
+now: "2026-09-16T09:00:00"
+input: "周日下午3点取婚纱照"
+expect:
+  due_date: "2026-09-20"
+  due_time: "15:00"
+  title_exact: "取婚纱照"
+tags: [zh, date, time, easy, rule_solvable]

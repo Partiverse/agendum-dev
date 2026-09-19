@@ -1,0 +1,8 @@
+# 模糊时间 "some time next week"；云端裁决为下周一。
+id: en-102
+now: "2026-09-19T09:00:00"
+input: "some time next week plan q4"
+expect:
+  due_date: "2026-09-21"
+  title_contains: "plan q4"
+tags: [en, date, ambiguous, needs_cloud]

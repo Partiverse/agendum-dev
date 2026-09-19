@@ -1,0 +1,8 @@
+# 口语 "an hour or so"；规则层不解析英文冠词数量词。
+id: en-101
+now: "2026-09-19T09:00:00"
+input: "an hour or so email cleanup"
+expect:
+  estimate_minutes: 60
+  title_contains: "email cleanup"
+tags: [en, duration, ambiguous, 对抗, needs_cloud]

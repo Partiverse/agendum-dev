@@ -1,0 +1,8 @@
+# 规则层缺口：v0 标签边界不排除尾随标点（? 被并入标签）。
+id: zh-132
+now: "2026-09-19T09:00:00"
+input: "#重要? 备份照片"
+expect:
+  tags: [重要]
+  title_exact: "备份照片"
+tags: [zh, tag, ambiguous, 对抗, rule_solvable]

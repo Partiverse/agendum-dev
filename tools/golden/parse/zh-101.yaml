@@ -1,0 +1,9 @@
+id: zh-101
+now: "2026-09-19T09:00:00"
+input: "今天23点前交申请书"
+expect:
+  due_date: "2026-09-19"
+  due_time: "23:00"
+  is_deadline: true
+  title_exact: "交申请书"
+tags: [zh, date, time, deadline, easy, rule_solvable]

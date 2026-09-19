@@ -1,0 +1,8 @@
+id: zh-123
+now: "2026-09-19T09:00:00"
+input: "大概下周一或者周二给答复"
+expect:
+  due_date: "2026-09-21"
+  ambiguities_min: 1
+  title_contains: "给答复"
+tags: [zh, date, ambiguous, rule_solvable]

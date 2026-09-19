@@ -1,0 +1,7 @@
+id: en-017
+now: "2026-09-19T09:00:00"
+input: "buy groceries #errands #home"
+expect:
+  tags: [errands, home]
+  title_contains: "buy groceries"
+tags: [en, tag, easy, rule_solvable]

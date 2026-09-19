@@ -1,0 +1,7 @@
+id: zh-094
+now: "2026-09-19T09:00:00"
+input: "3.5小时 搬家收拾"
+expect:
+  estimate_minutes: 210
+  title_contains: "搬家收拾"
+tags: [zh, duration, easy, rule_solvable]

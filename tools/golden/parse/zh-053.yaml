@@ -1,0 +1,7 @@
+id: zh-053
+now: "2026-09-19T09:00:00"
+input: "3小时年度复盘"
+expect:
+  estimate_minutes: 180
+  title_contains: "年度复盘"
+tags: [zh, duration, easy, rule_solvable]

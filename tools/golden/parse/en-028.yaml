@@ -1,0 +1,9 @@
+# 复合时长 "1h 30m"；v0 只取第一个时长。
+id: en-028
+now: "2026-09-19T09:00:00"
+input: "1h 30m watch lecture"
+expect:
+  estimate_minutes: 90
+  ambiguities_min: 1
+  title_contains: "watch lecture"
+tags: [en, duration, ambiguous, 对抗, needs_cloud]

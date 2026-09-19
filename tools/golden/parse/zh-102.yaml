@@ -1,0 +1,8 @@
+id: zh-102
+now: "2026-09-19T09:00:00"
+input: "后天上午 瑜伽课"
+expect:
+  due_date: "2026-09-21"
+  reminder_time: null
+  title_contains: "瑜伽课"
+tags: [zh, date, time, easy, negative, rule_solvable]

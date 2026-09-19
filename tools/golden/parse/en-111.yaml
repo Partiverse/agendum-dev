@@ -1,0 +1,7 @@
+id: en-111
+now: "2026-09-19T09:00:00"
+input: "grocery run !high"
+expect:
+  energy: high
+  title_contains: "grocery run"
+tags: [en, energy, easy, rule_solvable]

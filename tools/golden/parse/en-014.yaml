@@ -1,0 +1,7 @@
+id: en-014
+now: "2026-09-19T09:00:00"
+input: "deep clean kitchen !low"
+expect:
+  energy: low
+  title_exact: "deep clean kitchen"
+tags: [en, energy, easy, rule_solvable]

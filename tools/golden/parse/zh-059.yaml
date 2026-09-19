@@ -1,0 +1,8 @@
+# 精力标记无"!"前缀；规则层不猜，云端可从语义推断。
+id: zh-059
+now: "2026-09-19T09:00:00"
+input: "写白皮书 高精力"
+expect:
+  energy: high
+  title_exact: "写白皮书"
+tags: [zh, energy, colloquial, 对抗, needs_cloud]

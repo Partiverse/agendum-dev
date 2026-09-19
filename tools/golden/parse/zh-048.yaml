@@ -1,0 +1,9 @@
+# 规则层缺口：日期后的"…前"应标记截止语义（is_deadline）。
+id: zh-048
+now: "2026-09-19T09:00:00"
+input: "9月30日前提交季度OKR"
+expect:
+  due_date: "2026-09-30"
+  is_deadline: true
+  title_contains: "提交季度OKR"
+tags: [zh, date, deadline, ambiguous, rule_solvable]

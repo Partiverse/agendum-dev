@@ -1,0 +1,9 @@
+# 规则层缺口："今晚"不在时段词表（"晚上"在），11点半被误判为上午 11:30。
+id: zh-037
+now: "2026-09-19T09:00:00"
+input: "今晚11点半提交月度总结"
+expect:
+  due_date: "2026-09-19"
+  due_time: "23:30"
+  title_exact: "提交月度总结"
+tags: [zh, date, time, colloquial, rule_solvable]

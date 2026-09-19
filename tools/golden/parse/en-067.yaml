@@ -1,0 +1,7 @@
+id: en-067
+now: "2026-09-19T09:00:00"
+input: "#urgent! call insurance"
+expect:
+  tags: [urgent]
+  title_exact: "call insurance"
+tags: [en, tag, ambiguous, noise, rule_solvable]

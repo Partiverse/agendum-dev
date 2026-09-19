@@ -1,0 +1,7 @@
+id: zh-134
+now: "2026-09-19T09:00:00"
+input: "1小时到2小时整理仓库"
+expect:
+  estimate_minutes: 60
+  title_contains: "整理仓库"
+tags: [zh, duration, ambiguous, rule_solvable]

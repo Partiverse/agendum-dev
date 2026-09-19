@@ -1,0 +1,7 @@
+id: zh-107
+now: "2026-09-19T09:00:00"
+input: "明天买牛奶和面包"
+expect:
+  due_date: "2026-09-20"
+  title_exact: "买牛奶和面包"
+tags: [zh, date, easy, rule_solvable]

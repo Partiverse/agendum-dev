@@ -1,0 +1,8 @@
+id: en-073
+now: "2026-09-19T09:00:00"
+input: "9pm-11pm study block"
+expect:
+  reminder_time: "21:00"
+  ambiguities_min: 1
+  title_contains: "study block"
+tags: [en, time, ambiguous, 对抗, rule_solvable]
