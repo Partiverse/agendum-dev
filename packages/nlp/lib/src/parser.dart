@@ -32,11 +32,11 @@ final class CaptureParser {
     r'(\d+(?:\.\d+)?)\s*(?:小时|hours?\b|hr?s?\b)',
   );
   static final _durationHalfHourRe = RegExp('半小时');
-  static final _tagRe = RegExp(r'#([^\s#@，。,、！!]+)');
-  static final _projectRe = RegExp(r'@([^\s#@，。,、！!]+)');
+  static final _tagRe = RegExp(r'#([^\s#@，。,、！!?？;；]+)');
+  static final _projectRe = RegExp(r'@([^\s#@，。,、！!?？;；]+)');
 
   // ---- 日期短语（中英） ----
-  static final _relDayRe = RegExp('(今天|今日|今晚|明天|明日|后天|大后天)');
+  static final _relDayRe = RegExp('(今天|今日|今晚|今早|明早|明晚|明天|明日|后天|大后天)');
   static final _weekDayRe = RegExp('(下下个|下个|下下|下|本|这)?(?:周|星期|礼拜)([一二三四五六日天])');
   static final _monthDayRe = RegExp('(\\d{1,2})月(\\d{1,2})[日号]');
   static final _nextMonthRe = RegExp('下个?月(\\d{1,2})[日号]');
@@ -95,10 +95,13 @@ final class CaptureParser {
     '今天': 0,
     '今日': 0,
     '今晚': 0,
+    '今早': 0,
     'tonight': 0,
     'today': 0,
     '明天': 1,
     '明日': 1,
+    '明早': 1,
+    '明晚': 1,
     'tomorrow': 1,
     'tmr': 1,
     '后天': 2,
@@ -106,11 +109,15 @@ final class CaptureParser {
     '大后天': 3,
   };
 
+  /// 口语时段词 → 标准时段词：紧跟时刻时保留给时刻解析用
+  /// （"今晚11点半" → 日期=今天 + "晚上11点半" → 23:30，而非 11:30）。
+  static const _periodCarry = {'今晚': '晚上', '明晚': '晚上', '今早': '早上', '明早': '早上'};
+
   /// 解析自然语言输入。永不抛出（规则引擎层不因输入而失败）。
   ParsedCapture parse(String input) {
     final now = _now();
     final ambiguities = <String>[];
-    var text = input;
+    var text = input.replaceAll('明儿', '明天'); // 北方口语归一化
     String? energy;
     int? estimateMinutes;
     final tags = <String>[];
@@ -158,10 +165,15 @@ final class CaptureParser {
       if (!tags.contains(t)) tags.add(t);
       text = _blank(text, m);
     }
-    final projM = _projectRe.firstMatch(text);
-    if (projM != null) {
-      projectHint = projM.group(1)!;
-      text = _blank(text, projM);
+    final projMatches = _projectRe.allMatches(text).toList();
+    for (var i = 0; i < projMatches.length; i++) {
+      final m = projMatches[i];
+      text = _blank(text, m);
+      if (i == 0) {
+        projectHint = m.group(1)!;
+      } else {
+        ambiguities.add('多个项目路由：仅取第一个');
+      }
     }
 
     // 4. 日期：循环提取，第一个生效，其余记歧义
@@ -180,8 +192,22 @@ final class CaptureParser {
         _enWeekRe,
       ]);
       if (m == null) break;
+      final word = m.group(0)!;
       final day = _resolveDateMatch(m, now, ambiguities);
-      text = _blank(text, m);
+      // "今晚/明早…"紧跟时刻：记日期后把时段词转成标准词留给时刻解析。
+      final carry = _periodCarry[word];
+      final followedByTime = RegExp(
+        r'\s*\d{1,2}\s*[点时]',
+      ).hasMatch(text.substring(m.end));
+      if (carry != null && followedByTime && day != null) {
+        text = text.replaceRange(m.start, m.end, carry);
+      } else {
+        text = _blank(text, m);
+      }
+      // "日期…前"：截止语义标记（与时刻"…前"同义）。
+      if (day != null && RegExp(r'^\s*前').hasMatch(text.substring(m.start))) {
+        isDeadline = true;
+      }
       if (day == null) continue;
       dateCount++;
       if (dateCount == 1) {

@@ -1,0 +1,8 @@
+id: en-127
+now: "2026-09-19T09:00:00"
+input: "tomorrow morning 8am feed birds"
+expect:
+  due_date: "2026-09-20"
+  due_time: "08:00"
+  title_contains: "feed birds"
+tags: [en, date, time, colloquial, rule_solvable]

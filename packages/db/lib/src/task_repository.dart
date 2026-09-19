@@ -96,6 +96,20 @@ class TaskRepository {
     await _edit(row, {'status': TaskStatus.next.value});
   });
 
+  /// 回收进收件箱(走状态机;waiting → inbox 不在流转表,会按红线抛出)。
+  Future<void> moveToInbox(String id) => _db.transaction(() async {
+    final row = await _byId(id);
+    transition(TaskStatus.fromValue(row.status), TaskStatus.inbox);
+    await _edit(row, {'status': TaskStatus.inbox.value, 'completed_at': null});
+  });
+
+  /// 任务挂到项目/移出项目(project_id 可空)。
+  Future<void> setTaskProject(String id, String? projectId) =>
+      _db.transaction(() async {
+        final row = await _byId(id);
+        await _edit(row, {'project_id': projectId});
+      });
+
   Future<Task> byId(String id) => _byId(id);
 
   /// 收件箱透视快照:未澄清 + 已完成(Things 行为:完成保留显示删除线)。
@@ -106,7 +120,81 @@ class TaskRepository {
   Future<List<Task>> inboxSnapshot() => _inboxQuery().get();
 
   /// 今日透视快照:next 状态 + 截止日未过的任务(样板期简化语义)。
+  /// 已完成保留显示删除线(Things 行为):行不消失,⌫ 回收等键盘流才有落点。
   Future<List<Task>> todaySnapshot() => _todayQuery().get();
+
+  /// 计划透视:活跃任务中带 planned/due 日期的,按日期排序(S06 简化语义)。
+  Future<List<Task>> planSnapshot() =>
+      (_db.select(_db.tasks)
+            ..where(
+              (t) =>
+                  t.deletedAt.isNull() &
+                  t.status.isNotIn([
+                    TaskStatus.done.value,
+                    TaskStatus.trashed.value,
+                  ]) &
+                  (t.plannedDate.isNotNull() | t.dueDate.isNotNull()),
+            )
+            ..orderBy([
+              (t) => OrderingTerm.asc(t.plannedDate),
+              (t) => OrderingTerm.asc(t.dueDate),
+            ]))
+          .get();
+
+  /// 随时透视:someday + 无日期的 next(S06 简化语义)。
+  Future<List<Task>> anytimeSnapshot() =>
+      (_db.select(_db.tasks)
+            ..where(
+              (t) =>
+                  t.deletedAt.isNull() &
+                  t.plannedDate.isNull() &
+                  t.dueDate.isNull() &
+                  (t.status.equals(TaskStatus.someday.value) |
+                      t.status.equals(TaskStatus.next.value)),
+            )
+            ..orderBy([
+              (t) => OrderingTerm.desc(t.createdAt),
+              (t) => OrderingTerm.desc(t.id),
+            ]))
+          .get();
+
+  /// 回顾透视:近 7 天完成(周回顾的素材面)。
+  Future<List<Task>> reviewSnapshot() {
+    final since = DateTime.now()
+        .add(const Duration(days: -7))
+        .millisecondsSinceEpoch;
+    return (_db.select(_db.tasks)
+          ..where(
+            (t) =>
+                t.deletedAt.isNull() &
+                t.status.equals(TaskStatus.done.value) &
+                t.completedAt.isBiggerOrEqualValue(since),
+          )
+          ..orderBy([(t) => OrderingTerm.desc(t.completedAt)]))
+        .get();
+  }
+
+  /// 日志簿:全部已完成,按完成时间倒序。
+  Future<List<Task>> logSnapshot() =>
+      (_db.select(_db.tasks)
+            ..where(
+              (t) =>
+                  t.deletedAt.isNull() & t.status.equals(TaskStatus.done.value),
+            )
+            ..orderBy([(t) => OrderingTerm.desc(t.completedAt)]))
+          .get();
+
+  /// 项目透视:挂到指定项目的活跃任务(trashed 排除)。
+  Future<List<Task>> tasksByProjectSnapshot(String projectId) =>
+      (_db.select(_db.tasks)
+            ..where(
+              (t) =>
+                  t.deletedAt.isNull() &
+                  t.projectId.equals(projectId) &
+                  t.status.isNotIn([TaskStatus.trashed.value]),
+            )
+            ..orderBy([(t) => OrderingTerm.asc(t.sortKey)]))
+          .get();
 
   SimpleSelectStatement<$TasksTable, Task> _inboxQuery() {
     final q = _db.select(_db.tasks)
@@ -128,11 +216,9 @@ class TaskRepository {
       ..where(
         (t) =>
             t.deletedAt.isNull() &
-            t.status.isNotIn([
-              TaskStatus.done.value,
-              TaskStatus.trashed.value,
-            ]) &
+            t.status.isNotIn([TaskStatus.trashed.value]) &
             (t.status.equals(TaskStatus.next.value) |
+                t.status.equals(TaskStatus.done.value) |
                 (t.dueDate.isNotNull() &
                     t.dueDate.isSmallerOrEqualValue(today))),
       )
@@ -208,6 +294,7 @@ class TaskRepository {
     'actual_minutes' => row.actualMinutes,
     'energy' => row.energy,
     'waiting_for' => row.waitingFor,
+    'project_id' => row.projectId,
     'sort_key' => row.sortKey,
     _ => throw ArgumentError('未知任务字段:$field'),
   };

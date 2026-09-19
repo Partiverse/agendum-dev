@@ -1,0 +1,8 @@
+id: zh-152
+now: "2026-09-19T09:00:00"
+input: "@看书 @健身 今晚只做一个"
+expect:
+  project_hint: "看书"
+  ambiguities_min: 1
+  title_contains: "只做一个"
+tags: [zh, project, ambiguous, rule_solvable]

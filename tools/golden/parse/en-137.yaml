@@ -1,0 +1,8 @@
+id: en-137
+now: "2026-09-19T09:00:00"
+input: "next friday 6pm toastmasters"
+expect:
+  due_date: "2026-09-25"
+  due_time: "18:00"
+  title_contains: "toastmasters"
+tags: [en, date, time, easy, rule_solvable]

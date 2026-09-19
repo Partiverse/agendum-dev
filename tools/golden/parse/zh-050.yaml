@@ -5,4 +5,4 @@ input: "一周后复查"
 expect:
   due_date: "2026-09-26"
   title_contains: "复查"
-tags: [zh, date, colloquial, needs_system_model]
+tags: [zh, date, colloquial, 对抗, needs_system_model]

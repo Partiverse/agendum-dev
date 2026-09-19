@@ -3,5 +3,6 @@ now: "2026-09-19T09:00:00"
 input: "moving @storage or @donation boxes"
 expect:
   project_hint: "storage"
-  title_contains: "donation"
-tags: [en, project, ambiguous, rule_solvable]
+  ambiguities_min: 1
+  title_contains: "boxes"
+tags: [en, project, ambiguous, 对抗, rule_solvable]

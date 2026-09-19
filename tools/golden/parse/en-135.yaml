@@ -1,0 +1,8 @@
+id: en-135
+now: "2026-09-19T09:00:00"
+input: "@alpha or @beta review candidates"
+expect:
+  project_hint: "alpha"
+  ambiguities_min: 1
+  title_contains: "review candidates"
+tags: [en, project, ambiguous, rule_solvable]

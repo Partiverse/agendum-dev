@@ -5,4 +5,4 @@ input: "this weekend clean garage"
 expect:
   due_date: "2026-09-19"
   title_contains: "clean garage"
-tags: [en, date, ambiguous, needs_system_model]
+tags: [en, date, ambiguous, 对抗, needs_system_model]

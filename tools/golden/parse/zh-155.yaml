@@ -1,0 +1,8 @@
+id: zh-155
+now: "2026-09-19T09:00:00"
+input: "9月28日下午2点30分部门例会"
+expect:
+  due_date: "2026-09-28"
+  due_time: "14:30"
+  title_contains: "部门例会"
+tags: [zh, date, time, easy, rule_solvable]

@@ -1,0 +1,8 @@
+id: zh-153
+now: "2026-09-19T09:00:00"
+input: "@车 出发前充电 1小时"
+expect:
+  project_hint: "车"
+  estimate_minutes: 60
+  title_contains: "出发前充电"
+tags: [zh, project, duration, easy, rule_solvable]

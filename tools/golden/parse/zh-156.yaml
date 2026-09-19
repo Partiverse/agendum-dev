@@ -1,0 +1,7 @@
+id: zh-156
+now: "2026-09-19T09:00:00"
+input: "45分钟还是1小时复盘会"
+expect:
+  estimate_minutes: 45
+  title_contains: "复盘会"
+tags: [zh, duration, ambiguous, rule_solvable]

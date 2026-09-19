@@ -1,0 +1,7 @@
+id: en-131
+now: "2026-09-19T09:00:00"
+input: "2 hours or 90 mins deep work"
+expect:
+  estimate_minutes: 120
+  title_contains: "deep work"
+tags: [en, duration, ambiguous, rule_solvable]

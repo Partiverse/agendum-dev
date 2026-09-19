@@ -1,0 +1,8 @@
+id: zh-143
+now: "2026-09-19T09:00:00"
+input: "明晚8点看球"
+expect:
+  due_date: "2026-09-20"
+  due_time: "20:00"
+  title_exact: "看球"
+tags: [zh, date, time, colloquial, rule_solvable]

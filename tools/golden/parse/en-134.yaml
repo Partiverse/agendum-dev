@@ -1,0 +1,7 @@
+id: en-134
+now: "2026-09-19T09:00:00"
+input: "#someday? relearn guitar"
+expect:
+  tags: [someday]
+  title_exact: "relearn guitar"
+tags: [en, tag, ambiguous, rule_solvable]

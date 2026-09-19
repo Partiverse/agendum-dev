@@ -9,10 +9,12 @@ import 'store.dart';
 
 /// 捕获条（设计公理 1 的载体）：单行输入、回车即入收件箱、
 /// 输入过程中实时显示端上解析预览（packages/nlp 真实引擎）。
+/// [focusNode] 可选外部注入（⌘N 键盘流从外壳聚焦）。
 class CaptureBar extends StatefulWidget {
-  const CaptureBar({super.key, required this.store});
+  const CaptureBar({super.key, required this.store, this.focusNode});
 
   final TaskStore store;
+  final FocusNode? focusNode;
 
   @override
   State<CaptureBar> createState() => _CaptureBarState();
@@ -20,13 +22,14 @@ class CaptureBar extends StatefulWidget {
 
 class _CaptureBarState extends State<CaptureBar> {
   final _controller = TextEditingController();
-  final _focus = FocusNode();
+  FocusNode? _ownFocus;
+  FocusNode get _focus => widget.focusNode ?? (_ownFocus ??= FocusNode());
   ParsedCapture _parsed = const ParsedCapture(title: '', confidence: 0);
 
   @override
   void dispose() {
     _controller.dispose();
-    _focus.dispose();
+    _ownFocus?.dispose();
     super.dispose();
   }
 

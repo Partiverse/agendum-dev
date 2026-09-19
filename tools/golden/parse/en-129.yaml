@@ -1,0 +1,7 @@
+id: en-129
+now: "2026-09-19T09:00:00"
+input: "10/30 halloween prep"
+expect:
+  due_date: "2026-10-30"
+  title_contains: "halloween prep"
+tags: [en, date, easy, rule_solvable]

@@ -1,0 +1,8 @@
+id: zh-144
+now: "2026-09-19T09:00:00"
+input: "今早9点晨读"
+expect:
+  due_date: "2026-09-19"
+  due_time: "09:00"
+  title_exact: "晨读"
+tags: [zh, date, time, colloquial, rule_solvable]

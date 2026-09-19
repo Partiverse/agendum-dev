@@ -1,0 +1,8 @@
+id: en-133
+now: "2026-09-19T09:00:00"
+input: "#idea sketch app layout #design 1h"
+expect:
+  tags: [idea, design]
+  estimate_minutes: 60
+  title_contains: "sketch app layout"
+tags: [en, tag, duration, easy, rule_solvable]

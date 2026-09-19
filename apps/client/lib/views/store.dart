@@ -37,13 +37,20 @@ class TaskItem {
 /// ([SyncEngine.onRemoteApplied]);不订阅 drift watch 流。
 /// 可选挂接同步引擎:serverBase 非空时开启 15s 轮询的客户端↔服务端闭环。
 class TaskStore extends ChangeNotifier {
-  TaskStore._(this._repo);
+  TaskStore._(this._repo, this._projects);
 
   final TaskRepository _repo;
+  final ProjectRepository _projects;
   SyncEngine? _engine;
 
   List<TaskItem> _inbox = const [];
   List<TaskItem> _today = const [];
+  List<TaskItem> _plan = const [];
+  List<TaskItem> _anytime = const [];
+  List<TaskItem> _review = const [];
+  List<TaskItem> _log = const [];
+  List<({String id, String name, int openCount, bool done})> _projectList =
+      const [];
 
   /// 打开:传入 executor(测试用内存库;主入口传文件库)。
   /// [serverBase] 非空时创建同步引擎;[autoSync] 开启 15s 轮询,
@@ -55,8 +62,9 @@ class TaskStore extends ChangeNotifier {
     bool autoSync = true,
   }) async {
     final db = AgendumDatabase(executor);
-    final repo = TaskRepository(db, await DriftLocalSyncStore.open(db));
-    final store = TaskStore._(repo);
+    final sync = await DriftLocalSyncStore.open(db);
+    final repo = TaskRepository(db, sync);
+    final store = TaskStore._(repo, ProjectRepository(db, sync));
     if (serverBase != null) {
       store._engine = SyncEngine(
         store: repo.sync,
@@ -81,6 +89,22 @@ class TaskStore extends ChangeNotifier {
   /// 今日视图:next 状态 + 截止日未过的任务(样板期简化语义)。
   List<TaskItem> get todayTasks => List.unmodifiable(_today);
 
+  /// 计划视图:带 planned/due 日期的活跃任务。
+  List<TaskItem> get planTasks => List.unmodifiable(_plan);
+
+  /// 随时视图:someday + 无日期的 next。
+  List<TaskItem> get anytimeTasks => List.unmodifiable(_anytime);
+
+  /// 回顾视图:近 7 天完成。
+  List<TaskItem> get reviewTasks => List.unmodifiable(_review);
+
+  /// 日志簿:全部已完成。
+  List<TaskItem> get logTasks => List.unmodifiable(_log);
+
+  /// 项目列表(含未完成任务数)。
+  List<({String id, String name, int openCount, bool done})> get projectList =>
+      List.unmodifiable(_projectList);
+
   /// 捕获入库:解析结果字段直接落模型(智能捕获公理 1 的最小闭环)。
   Future<void> addFromCapture(ParsedCapture r) async {
     await _repo.addFromCapture(r);
@@ -90,10 +114,17 @@ class TaskStore extends ChangeNotifier {
   Future<void> addManual(String title) =>
       addFromCapture(ParsedCapture(title: title, confidence: 0));
 
-  TaskItem byId(String id) => _inbox.firstWhere(
-    (t) => t.id == id,
-    orElse: () => _today.firstWhere((t) => t.id == id),
-  );
+  TaskItem byId(String id) =>
+      _inbox.firstWhere((t) => t.id == id, orElse: () => _anyTask(id));
+
+  TaskItem _anyTask(String id) {
+    for (final list in [_today, _plan, _anytime, _review, _log]) {
+      for (final t in list) {
+        if (t.id == id) return t;
+      }
+    }
+    throw StateError('任务不在任何视图缓存中:$id');
+  }
 
   /// 完成/恢复(领域状态机)。
   Future<void> toggleDone(String id) async {
@@ -106,6 +137,29 @@ class TaskStore extends ChangeNotifier {
     await _repo.promoteToNext(id);
     await _reload();
   }
+
+  /// 回收进收件箱(⌫ 键盘流;非法流转由领域红线抛出)。
+  Future<void> moveToInbox(String id) async {
+    await _repo.moveToInbox(id);
+    await _reload();
+  }
+
+  /// 新建项目(项目视图内联创建)。
+  Future<void> addProject(String name) async {
+    if (name.trim().isEmpty) return;
+    await _projects.createProject(name: name.trim());
+    await _reload();
+  }
+
+  /// 任务挂到项目/移出项目。
+  Future<void> setTaskProject(String taskId, String? projectId) async {
+    await _repo.setTaskProject(taskId, projectId);
+    await _reload();
+  }
+
+  /// 项目内任务(项目详情展开用)。
+  Future<List<TaskItem>> tasksInProject(String projectId) async =>
+      TaskStore._mapAll(await _repo.tasksByProjectSnapshot(projectId));
 
   /// 手动触发一轮同步(push + pull)。
   Future<void> syncNow() async {
@@ -124,6 +178,19 @@ class TaskStore extends ChangeNotifier {
   Future<void> _reload() async {
     _inbox = _mapAll(await _repo.inboxSnapshot());
     _today = _mapAll(await _repo.todaySnapshot());
+    _plan = _mapAll(await _repo.planSnapshot());
+    _anytime = _mapAll(await _repo.anytimeSnapshot());
+    _review = _mapAll(await _repo.reviewSnapshot());
+    _log = _mapAll(await _repo.logSnapshot());
+    _projectList = [
+      for (final (p, count) in await _projects.projectListSnapshot())
+        (
+          id: p.id,
+          name: p.name,
+          openCount: count,
+          done: p.status == ProjectStatus.done.value,
+        ),
+    ];
     notifyListeners();
   }
 

@@ -1,8 +1,8 @@
-/// Drift 表定义 —— SQLite DDL v1(03 文档 §2)。
+/// Drift 表定义 —— SQLite DDL v2(03 文档 §2)。
 ///
-/// PoC 只落地 tasks 实体(Project/Area 随 S06 视图扩展);同步基建三表
-/// (oplog / sync_state / field_lamport)全量落地。外键约束暂不启用
-/// (tasks 自嵌套/跨表引用在 PoC 单实体下无意义,S06 落地时补)。
+/// v2(S06)新增 areas / projects 实体;同步基建三表
+/// (oplog / sync_state / field_lamport)自 v1 全量落地。外键约束不启用:
+/// 跨实体引用以应用层完整性规则维护(S07 落地项目删除→任务回收件箱)。
 ///
 /// field_lamport 是 03 文档 §2.4 之外补充的客户端表:pull 应用时按
 /// (lamport, origin, op) 判定远端 op 是否胜出,与服务端 entity_lamport
@@ -37,6 +37,50 @@ class Tasks extends Table {
   // 公共同步列(03 文档 §2.1)。
   IntColumn get createdAt => integer()(); // epoch ms
   IntColumn get updatedAt => integer()(); // epoch ms(仅展示,不参与裁决)
+  IntColumn get lamport => integer()();
+  TextColumn get origin => text()();
+  IntColumn get deletedAt => integer().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// areas 表(03 文档 §2.2):任务与项目的上层归属,无状态字段。
+@DataClassName('Area')
+class Areas extends Table {
+  TextColumn get id => text()();
+  TextColumn get name => text()();
+  TextColumn get color => text().nullable()();
+  TextColumn get sortKey => text()();
+
+  // 公共同步列(03 文档 §2.1)。
+  IntColumn get createdAt => integer()(); // epoch ms
+  IntColumn get updatedAt => integer()();
+  IntColumn get lamport => integer()();
+  TextColumn get origin => text()();
+  IntColumn get deletedAt => integer().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// projects 表(03 文档 §2.2):嵌套 + area 归属 + 显式 next action 指针。
+@TableIndex(name: 'idx_projects_status', columns: {#status, #deletedAt})
+@DataClassName('Project')
+class Projects extends Table {
+  TextColumn get id => text()();
+  TextColumn get parentId => text().nullable()();
+  TextColumn get areaId => text().nullable()();
+  TextColumn get name => text()();
+  TextColumn get note => text().nullable()();
+  TextColumn get status => text().withDefault(const Constant('active'))();
+  IntColumn get reviewCadenceDays => integer().nullable()();
+  TextColumn get nextActionId => text().nullable()();
+  TextColumn get sortKey => text()();
+
+  // 公共同步列(03 文档 §2.1)。
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
   IntColumn get lamport => integer()();
   TextColumn get origin => text()();
   IntColumn get deletedAt => integer().nullable()();

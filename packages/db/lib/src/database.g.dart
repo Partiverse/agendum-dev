@@ -1265,6 +1265,1364 @@ class TasksCompanion extends UpdateCompanion<Task> {
   }
 }
 
+class $AreasTable extends Areas with TableInfo<$AreasTable, Area> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AreasTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _colorMeta = const VerificationMeta('color');
+  @override
+  late final GeneratedColumn<String> color = GeneratedColumn<String>(
+    'color',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sortKeyMeta = const VerificationMeta(
+    'sortKey',
+  );
+  @override
+  late final GeneratedColumn<String> sortKey = GeneratedColumn<String>(
+    'sort_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lamportMeta = const VerificationMeta(
+    'lamport',
+  );
+  @override
+  late final GeneratedColumn<int> lamport = GeneratedColumn<int>(
+    'lamport',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _originMeta = const VerificationMeta('origin');
+  @override
+  late final GeneratedColumn<String> origin = GeneratedColumn<String>(
+    'origin',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<int> deletedAt = GeneratedColumn<int>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    color,
+    sortKey,
+    createdAt,
+    updatedAt,
+    lamport,
+    origin,
+    deletedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'areas';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Area> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('color')) {
+      context.handle(
+        _colorMeta,
+        color.isAcceptableOrUnknown(data['color']!, _colorMeta),
+      );
+    }
+    if (data.containsKey('sort_key')) {
+      context.handle(
+        _sortKeyMeta,
+        sortKey.isAcceptableOrUnknown(data['sort_key']!, _sortKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sortKeyMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('lamport')) {
+      context.handle(
+        _lamportMeta,
+        lamport.isAcceptableOrUnknown(data['lamport']!, _lamportMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_lamportMeta);
+    }
+    if (data.containsKey('origin')) {
+      context.handle(
+        _originMeta,
+        origin.isAcceptableOrUnknown(data['origin']!, _originMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_originMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Area map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Area(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      color: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}color'],
+      ),
+      sortKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sort_key'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      lamport: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}lamport'],
+      )!,
+      origin: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}origin'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  $AreasTable createAlias(String alias) {
+    return $AreasTable(attachedDatabase, alias);
+  }
+}
+
+class Area extends DataClass implements Insertable<Area> {
+  final String id;
+  final String name;
+  final String? color;
+  final String sortKey;
+  final int createdAt;
+  final int updatedAt;
+  final int lamport;
+  final String origin;
+  final int? deletedAt;
+  const Area({
+    required this.id,
+    required this.name,
+    this.color,
+    required this.sortKey,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.lamport,
+    required this.origin,
+    this.deletedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || color != null) {
+      map['color'] = Variable<String>(color);
+    }
+    map['sort_key'] = Variable<String>(sortKey);
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    map['lamport'] = Variable<int>(lamport);
+    map['origin'] = Variable<String>(origin);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<int>(deletedAt);
+    }
+    return map;
+  }
+
+  AreasCompanion toCompanion(bool nullToAbsent) {
+    return AreasCompanion(
+      id: Value(id),
+      name: Value(name),
+      color: color == null && nullToAbsent
+          ? const Value.absent()
+          : Value(color),
+      sortKey: Value(sortKey),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      lamport: Value(lamport),
+      origin: Value(origin),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+    );
+  }
+
+  factory Area.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Area(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      color: serializer.fromJson<String?>(json['color']),
+      sortKey: serializer.fromJson<String>(json['sortKey']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+      lamport: serializer.fromJson<int>(json['lamport']),
+      origin: serializer.fromJson<String>(json['origin']),
+      deletedAt: serializer.fromJson<int?>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'color': serializer.toJson<String?>(color),
+      'sortKey': serializer.toJson<String>(sortKey),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+      'lamport': serializer.toJson<int>(lamport),
+      'origin': serializer.toJson<String>(origin),
+      'deletedAt': serializer.toJson<int?>(deletedAt),
+    };
+  }
+
+  Area copyWith({
+    String? id,
+    String? name,
+    Value<String?> color = const Value.absent(),
+    String? sortKey,
+    int? createdAt,
+    int? updatedAt,
+    int? lamport,
+    String? origin,
+    Value<int?> deletedAt = const Value.absent(),
+  }) => Area(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    color: color.present ? color.value : this.color,
+    sortKey: sortKey ?? this.sortKey,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    lamport: lamport ?? this.lamport,
+    origin: origin ?? this.origin,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  Area copyWithCompanion(AreasCompanion data) {
+    return Area(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      color: data.color.present ? data.color.value : this.color,
+      sortKey: data.sortKey.present ? data.sortKey.value : this.sortKey,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      lamport: data.lamport.present ? data.lamport.value : this.lamport,
+      origin: data.origin.present ? data.origin.value : this.origin,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Area(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('color: $color, ')
+          ..write('sortKey: $sortKey, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('lamport: $lamport, ')
+          ..write('origin: $origin, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    name,
+    color,
+    sortKey,
+    createdAt,
+    updatedAt,
+    lamport,
+    origin,
+    deletedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Area &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.color == this.color &&
+          other.sortKey == this.sortKey &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.lamport == this.lamport &&
+          other.origin == this.origin &&
+          other.deletedAt == this.deletedAt);
+}
+
+class AreasCompanion extends UpdateCompanion<Area> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<String?> color;
+  final Value<String> sortKey;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  final Value<int> lamport;
+  final Value<String> origin;
+  final Value<int?> deletedAt;
+  final Value<int> rowid;
+  const AreasCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.color = const Value.absent(),
+    this.sortKey = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.lamport = const Value.absent(),
+    this.origin = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AreasCompanion.insert({
+    required String id,
+    required String name,
+    this.color = const Value.absent(),
+    required String sortKey,
+    required int createdAt,
+    required int updatedAt,
+    required int lamport,
+    required String origin,
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name),
+       sortKey = Value(sortKey),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       lamport = Value(lamport),
+       origin = Value(origin);
+  static Insertable<Area> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<String>? color,
+    Expression<String>? sortKey,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+    Expression<int>? lamport,
+    Expression<String>? origin,
+    Expression<int>? deletedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (color != null) 'color': color,
+      if (sortKey != null) 'sort_key': sortKey,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (lamport != null) 'lamport': lamport,
+      if (origin != null) 'origin': origin,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AreasCompanion copyWith({
+    Value<String>? id,
+    Value<String>? name,
+    Value<String?>? color,
+    Value<String>? sortKey,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+    Value<int>? lamport,
+    Value<String>? origin,
+    Value<int?>? deletedAt,
+    Value<int>? rowid,
+  }) {
+    return AreasCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      color: color ?? this.color,
+      sortKey: sortKey ?? this.sortKey,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      lamport: lamport ?? this.lamport,
+      origin: origin ?? this.origin,
+      deletedAt: deletedAt ?? this.deletedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (color.present) {
+      map['color'] = Variable<String>(color.value);
+    }
+    if (sortKey.present) {
+      map['sort_key'] = Variable<String>(sortKey.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (lamport.present) {
+      map['lamport'] = Variable<int>(lamport.value);
+    }
+    if (origin.present) {
+      map['origin'] = Variable<String>(origin.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<int>(deletedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AreasCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('color: $color, ')
+          ..write('sortKey: $sortKey, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('lamport: $lamport, ')
+          ..write('origin: $origin, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ProjectsTable extends Projects with TableInfo<$ProjectsTable, Project> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ProjectsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _parentIdMeta = const VerificationMeta(
+    'parentId',
+  );
+  @override
+  late final GeneratedColumn<String> parentId = GeneratedColumn<String>(
+    'parent_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _areaIdMeta = const VerificationMeta('areaId');
+  @override
+  late final GeneratedColumn<String> areaId = GeneratedColumn<String>(
+    'area_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  @override
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+    'note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('active'),
+  );
+  static const VerificationMeta _reviewCadenceDaysMeta = const VerificationMeta(
+    'reviewCadenceDays',
+  );
+  @override
+  late final GeneratedColumn<int> reviewCadenceDays = GeneratedColumn<int>(
+    'review_cadence_days',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nextActionIdMeta = const VerificationMeta(
+    'nextActionId',
+  );
+  @override
+  late final GeneratedColumn<String> nextActionId = GeneratedColumn<String>(
+    'next_action_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sortKeyMeta = const VerificationMeta(
+    'sortKey',
+  );
+  @override
+  late final GeneratedColumn<String> sortKey = GeneratedColumn<String>(
+    'sort_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lamportMeta = const VerificationMeta(
+    'lamport',
+  );
+  @override
+  late final GeneratedColumn<int> lamport = GeneratedColumn<int>(
+    'lamport',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _originMeta = const VerificationMeta('origin');
+  @override
+  late final GeneratedColumn<String> origin = GeneratedColumn<String>(
+    'origin',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<int> deletedAt = GeneratedColumn<int>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    parentId,
+    areaId,
+    name,
+    note,
+    status,
+    reviewCadenceDays,
+    nextActionId,
+    sortKey,
+    createdAt,
+    updatedAt,
+    lamport,
+    origin,
+    deletedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'projects';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Project> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('parent_id')) {
+      context.handle(
+        _parentIdMeta,
+        parentId.isAcceptableOrUnknown(data['parent_id']!, _parentIdMeta),
+      );
+    }
+    if (data.containsKey('area_id')) {
+      context.handle(
+        _areaIdMeta,
+        areaId.isAcceptableOrUnknown(data['area_id']!, _areaIdMeta),
+      );
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('note')) {
+      context.handle(
+        _noteMeta,
+        note.isAcceptableOrUnknown(data['note']!, _noteMeta),
+      );
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    }
+    if (data.containsKey('review_cadence_days')) {
+      context.handle(
+        _reviewCadenceDaysMeta,
+        reviewCadenceDays.isAcceptableOrUnknown(
+          data['review_cadence_days']!,
+          _reviewCadenceDaysMeta,
+        ),
+      );
+    }
+    if (data.containsKey('next_action_id')) {
+      context.handle(
+        _nextActionIdMeta,
+        nextActionId.isAcceptableOrUnknown(
+          data['next_action_id']!,
+          _nextActionIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('sort_key')) {
+      context.handle(
+        _sortKeyMeta,
+        sortKey.isAcceptableOrUnknown(data['sort_key']!, _sortKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sortKeyMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('lamport')) {
+      context.handle(
+        _lamportMeta,
+        lamport.isAcceptableOrUnknown(data['lamport']!, _lamportMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_lamportMeta);
+    }
+    if (data.containsKey('origin')) {
+      context.handle(
+        _originMeta,
+        origin.isAcceptableOrUnknown(data['origin']!, _originMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_originMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Project map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Project(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      parentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}parent_id'],
+      ),
+      areaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}area_id'],
+      ),
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      note: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}note'],
+      ),
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      reviewCadenceDays: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}review_cadence_days'],
+      ),
+      nextActionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}next_action_id'],
+      ),
+      sortKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sort_key'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      lamport: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}lamport'],
+      )!,
+      origin: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}origin'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  $ProjectsTable createAlias(String alias) {
+    return $ProjectsTable(attachedDatabase, alias);
+  }
+}
+
+class Project extends DataClass implements Insertable<Project> {
+  final String id;
+  final String? parentId;
+  final String? areaId;
+  final String name;
+  final String? note;
+  final String status;
+  final int? reviewCadenceDays;
+  final String? nextActionId;
+  final String sortKey;
+  final int createdAt;
+  final int updatedAt;
+  final int lamport;
+  final String origin;
+  final int? deletedAt;
+  const Project({
+    required this.id,
+    this.parentId,
+    this.areaId,
+    required this.name,
+    this.note,
+    required this.status,
+    this.reviewCadenceDays,
+    this.nextActionId,
+    required this.sortKey,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.lamport,
+    required this.origin,
+    this.deletedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    if (!nullToAbsent || parentId != null) {
+      map['parent_id'] = Variable<String>(parentId);
+    }
+    if (!nullToAbsent || areaId != null) {
+      map['area_id'] = Variable<String>(areaId);
+    }
+    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || note != null) {
+      map['note'] = Variable<String>(note);
+    }
+    map['status'] = Variable<String>(status);
+    if (!nullToAbsent || reviewCadenceDays != null) {
+      map['review_cadence_days'] = Variable<int>(reviewCadenceDays);
+    }
+    if (!nullToAbsent || nextActionId != null) {
+      map['next_action_id'] = Variable<String>(nextActionId);
+    }
+    map['sort_key'] = Variable<String>(sortKey);
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    map['lamport'] = Variable<int>(lamport);
+    map['origin'] = Variable<String>(origin);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<int>(deletedAt);
+    }
+    return map;
+  }
+
+  ProjectsCompanion toCompanion(bool nullToAbsent) {
+    return ProjectsCompanion(
+      id: Value(id),
+      parentId: parentId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(parentId),
+      areaId: areaId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(areaId),
+      name: Value(name),
+      note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+      status: Value(status),
+      reviewCadenceDays: reviewCadenceDays == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reviewCadenceDays),
+      nextActionId: nextActionId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nextActionId),
+      sortKey: Value(sortKey),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      lamport: Value(lamport),
+      origin: Value(origin),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+    );
+  }
+
+  factory Project.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Project(
+      id: serializer.fromJson<String>(json['id']),
+      parentId: serializer.fromJson<String?>(json['parentId']),
+      areaId: serializer.fromJson<String?>(json['areaId']),
+      name: serializer.fromJson<String>(json['name']),
+      note: serializer.fromJson<String?>(json['note']),
+      status: serializer.fromJson<String>(json['status']),
+      reviewCadenceDays: serializer.fromJson<int?>(json['reviewCadenceDays']),
+      nextActionId: serializer.fromJson<String?>(json['nextActionId']),
+      sortKey: serializer.fromJson<String>(json['sortKey']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+      lamport: serializer.fromJson<int>(json['lamport']),
+      origin: serializer.fromJson<String>(json['origin']),
+      deletedAt: serializer.fromJson<int?>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'parentId': serializer.toJson<String?>(parentId),
+      'areaId': serializer.toJson<String?>(areaId),
+      'name': serializer.toJson<String>(name),
+      'note': serializer.toJson<String?>(note),
+      'status': serializer.toJson<String>(status),
+      'reviewCadenceDays': serializer.toJson<int?>(reviewCadenceDays),
+      'nextActionId': serializer.toJson<String?>(nextActionId),
+      'sortKey': serializer.toJson<String>(sortKey),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+      'lamport': serializer.toJson<int>(lamport),
+      'origin': serializer.toJson<String>(origin),
+      'deletedAt': serializer.toJson<int?>(deletedAt),
+    };
+  }
+
+  Project copyWith({
+    String? id,
+    Value<String?> parentId = const Value.absent(),
+    Value<String?> areaId = const Value.absent(),
+    String? name,
+    Value<String?> note = const Value.absent(),
+    String? status,
+    Value<int?> reviewCadenceDays = const Value.absent(),
+    Value<String?> nextActionId = const Value.absent(),
+    String? sortKey,
+    int? createdAt,
+    int? updatedAt,
+    int? lamport,
+    String? origin,
+    Value<int?> deletedAt = const Value.absent(),
+  }) => Project(
+    id: id ?? this.id,
+    parentId: parentId.present ? parentId.value : this.parentId,
+    areaId: areaId.present ? areaId.value : this.areaId,
+    name: name ?? this.name,
+    note: note.present ? note.value : this.note,
+    status: status ?? this.status,
+    reviewCadenceDays: reviewCadenceDays.present
+        ? reviewCadenceDays.value
+        : this.reviewCadenceDays,
+    nextActionId: nextActionId.present ? nextActionId.value : this.nextActionId,
+    sortKey: sortKey ?? this.sortKey,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    lamport: lamport ?? this.lamport,
+    origin: origin ?? this.origin,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  Project copyWithCompanion(ProjectsCompanion data) {
+    return Project(
+      id: data.id.present ? data.id.value : this.id,
+      parentId: data.parentId.present ? data.parentId.value : this.parentId,
+      areaId: data.areaId.present ? data.areaId.value : this.areaId,
+      name: data.name.present ? data.name.value : this.name,
+      note: data.note.present ? data.note.value : this.note,
+      status: data.status.present ? data.status.value : this.status,
+      reviewCadenceDays: data.reviewCadenceDays.present
+          ? data.reviewCadenceDays.value
+          : this.reviewCadenceDays,
+      nextActionId: data.nextActionId.present
+          ? data.nextActionId.value
+          : this.nextActionId,
+      sortKey: data.sortKey.present ? data.sortKey.value : this.sortKey,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      lamport: data.lamport.present ? data.lamport.value : this.lamport,
+      origin: data.origin.present ? data.origin.value : this.origin,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Project(')
+          ..write('id: $id, ')
+          ..write('parentId: $parentId, ')
+          ..write('areaId: $areaId, ')
+          ..write('name: $name, ')
+          ..write('note: $note, ')
+          ..write('status: $status, ')
+          ..write('reviewCadenceDays: $reviewCadenceDays, ')
+          ..write('nextActionId: $nextActionId, ')
+          ..write('sortKey: $sortKey, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('lamport: $lamport, ')
+          ..write('origin: $origin, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    parentId,
+    areaId,
+    name,
+    note,
+    status,
+    reviewCadenceDays,
+    nextActionId,
+    sortKey,
+    createdAt,
+    updatedAt,
+    lamport,
+    origin,
+    deletedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Project &&
+          other.id == this.id &&
+          other.parentId == this.parentId &&
+          other.areaId == this.areaId &&
+          other.name == this.name &&
+          other.note == this.note &&
+          other.status == this.status &&
+          other.reviewCadenceDays == this.reviewCadenceDays &&
+          other.nextActionId == this.nextActionId &&
+          other.sortKey == this.sortKey &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.lamport == this.lamport &&
+          other.origin == this.origin &&
+          other.deletedAt == this.deletedAt);
+}
+
+class ProjectsCompanion extends UpdateCompanion<Project> {
+  final Value<String> id;
+  final Value<String?> parentId;
+  final Value<String?> areaId;
+  final Value<String> name;
+  final Value<String?> note;
+  final Value<String> status;
+  final Value<int?> reviewCadenceDays;
+  final Value<String?> nextActionId;
+  final Value<String> sortKey;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  final Value<int> lamport;
+  final Value<String> origin;
+  final Value<int?> deletedAt;
+  final Value<int> rowid;
+  const ProjectsCompanion({
+    this.id = const Value.absent(),
+    this.parentId = const Value.absent(),
+    this.areaId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.note = const Value.absent(),
+    this.status = const Value.absent(),
+    this.reviewCadenceDays = const Value.absent(),
+    this.nextActionId = const Value.absent(),
+    this.sortKey = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.lamport = const Value.absent(),
+    this.origin = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ProjectsCompanion.insert({
+    required String id,
+    this.parentId = const Value.absent(),
+    this.areaId = const Value.absent(),
+    required String name,
+    this.note = const Value.absent(),
+    this.status = const Value.absent(),
+    this.reviewCadenceDays = const Value.absent(),
+    this.nextActionId = const Value.absent(),
+    required String sortKey,
+    required int createdAt,
+    required int updatedAt,
+    required int lamport,
+    required String origin,
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name),
+       sortKey = Value(sortKey),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       lamport = Value(lamport),
+       origin = Value(origin);
+  static Insertable<Project> custom({
+    Expression<String>? id,
+    Expression<String>? parentId,
+    Expression<String>? areaId,
+    Expression<String>? name,
+    Expression<String>? note,
+    Expression<String>? status,
+    Expression<int>? reviewCadenceDays,
+    Expression<String>? nextActionId,
+    Expression<String>? sortKey,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+    Expression<int>? lamport,
+    Expression<String>? origin,
+    Expression<int>? deletedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (parentId != null) 'parent_id': parentId,
+      if (areaId != null) 'area_id': areaId,
+      if (name != null) 'name': name,
+      if (note != null) 'note': note,
+      if (status != null) 'status': status,
+      if (reviewCadenceDays != null) 'review_cadence_days': reviewCadenceDays,
+      if (nextActionId != null) 'next_action_id': nextActionId,
+      if (sortKey != null) 'sort_key': sortKey,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (lamport != null) 'lamport': lamport,
+      if (origin != null) 'origin': origin,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ProjectsCompanion copyWith({
+    Value<String>? id,
+    Value<String?>? parentId,
+    Value<String?>? areaId,
+    Value<String>? name,
+    Value<String?>? note,
+    Value<String>? status,
+    Value<int?>? reviewCadenceDays,
+    Value<String?>? nextActionId,
+    Value<String>? sortKey,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+    Value<int>? lamport,
+    Value<String>? origin,
+    Value<int?>? deletedAt,
+    Value<int>? rowid,
+  }) {
+    return ProjectsCompanion(
+      id: id ?? this.id,
+      parentId: parentId ?? this.parentId,
+      areaId: areaId ?? this.areaId,
+      name: name ?? this.name,
+      note: note ?? this.note,
+      status: status ?? this.status,
+      reviewCadenceDays: reviewCadenceDays ?? this.reviewCadenceDays,
+      nextActionId: nextActionId ?? this.nextActionId,
+      sortKey: sortKey ?? this.sortKey,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      lamport: lamport ?? this.lamport,
+      origin: origin ?? this.origin,
+      deletedAt: deletedAt ?? this.deletedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (parentId.present) {
+      map['parent_id'] = Variable<String>(parentId.value);
+    }
+    if (areaId.present) {
+      map['area_id'] = Variable<String>(areaId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (reviewCadenceDays.present) {
+      map['review_cadence_days'] = Variable<int>(reviewCadenceDays.value);
+    }
+    if (nextActionId.present) {
+      map['next_action_id'] = Variable<String>(nextActionId.value);
+    }
+    if (sortKey.present) {
+      map['sort_key'] = Variable<String>(sortKey.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (lamport.present) {
+      map['lamport'] = Variable<int>(lamport.value);
+    }
+    if (origin.present) {
+      map['origin'] = Variable<String>(origin.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<int>(deletedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ProjectsCompanion(')
+          ..write('id: $id, ')
+          ..write('parentId: $parentId, ')
+          ..write('areaId: $areaId, ')
+          ..write('name: $name, ')
+          ..write('note: $note, ')
+          ..write('status: $status, ')
+          ..write('reviewCadenceDays: $reviewCadenceDays, ')
+          ..write('nextActionId: $nextActionId, ')
+          ..write('sortKey: $sortKey, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('lamport: $lamport, ')
+          ..write('origin: $origin, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $OplogTable extends Oplog with TableInfo<$OplogTable, OplogRow> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -2650,6 +4008,8 @@ abstract class _$AgendumDatabase extends GeneratedDatabase {
   _$AgendumDatabase(QueryExecutor e) : super(e);
   $AgendumDatabaseManager get managers => $AgendumDatabaseManager(this);
   late final $TasksTable tasks = $TasksTable(this);
+  late final $AreasTable areas = $AreasTable(this);
+  late final $ProjectsTable projects = $ProjectsTable(this);
   late final $OplogTable oplog = $OplogTable(this);
   late final $SyncStateTable syncState = $SyncStateTable(this);
   late final $FieldLamportTable fieldLamport = $FieldLamportTable(this);
@@ -2661,17 +4021,24 @@ abstract class _$AgendumDatabase extends GeneratedDatabase {
     'idx_tasks_dates',
     'CREATE INDEX idx_tasks_dates ON tasks (due_date, planned_date)',
   );
+  late final Index idxProjectsStatus = Index(
+    'idx_projects_status',
+    'CREATE INDEX idx_projects_status ON projects (status, deleted_at)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     tasks,
+    areas,
+    projects,
     oplog,
     syncState,
     fieldLamport,
     idxTasksStatus,
     idxTasksDates,
+    idxProjectsStatus,
   ];
 }
 
@@ -3223,6 +4590,645 @@ typedef $$TasksTableProcessedTableManager =
       $$TasksTableUpdateCompanionBuilder,
       (Task, BaseReferences<_$AgendumDatabase, $TasksTable, Task>),
       Task,
+      PrefetchHooks Function()
+    >;
+typedef $$AreasTableCreateCompanionBuilder =
+    AreasCompanion Function({
+      required String id,
+      required String name,
+      Value<String?> color,
+      required String sortKey,
+      required int createdAt,
+      required int updatedAt,
+      required int lamport,
+      required String origin,
+      Value<int?> deletedAt,
+      Value<int> rowid,
+    });
+typedef $$AreasTableUpdateCompanionBuilder =
+    AreasCompanion Function({
+      Value<String> id,
+      Value<String> name,
+      Value<String?> color,
+      Value<String> sortKey,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+      Value<int> lamport,
+      Value<String> origin,
+      Value<int?> deletedAt,
+      Value<int> rowid,
+    });
+
+class $$AreasTableFilterComposer
+    extends Composer<_$AgendumDatabase, $AreasTable> {
+  $$AreasTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get color => $composableBuilder(
+    column: $table.color,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sortKey => $composableBuilder(
+    column: $table.sortKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get lamport => $composableBuilder(
+    column: $table.lamport,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get origin => $composableBuilder(
+    column: $table.origin,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AreasTableOrderingComposer
+    extends Composer<_$AgendumDatabase, $AreasTable> {
+  $$AreasTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get color => $composableBuilder(
+    column: $table.color,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sortKey => $composableBuilder(
+    column: $table.sortKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get lamport => $composableBuilder(
+    column: $table.lamport,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get origin => $composableBuilder(
+    column: $table.origin,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AreasTableAnnotationComposer
+    extends Composer<_$AgendumDatabase, $AreasTable> {
+  $$AreasTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get color =>
+      $composableBuilder(column: $table.color, builder: (column) => column);
+
+  GeneratedColumn<String> get sortKey =>
+      $composableBuilder(column: $table.sortKey, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get lamport =>
+      $composableBuilder(column: $table.lamport, builder: (column) => column);
+
+  GeneratedColumn<String> get origin =>
+      $composableBuilder(column: $table.origin, builder: (column) => column);
+
+  GeneratedColumn<int> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+}
+
+class $$AreasTableTableManager
+    extends
+        RootTableManager<
+          _$AgendumDatabase,
+          $AreasTable,
+          Area,
+          $$AreasTableFilterComposer,
+          $$AreasTableOrderingComposer,
+          $$AreasTableAnnotationComposer,
+          $$AreasTableCreateCompanionBuilder,
+          $$AreasTableUpdateCompanionBuilder,
+          (Area, BaseReferences<_$AgendumDatabase, $AreasTable, Area>),
+          Area,
+          PrefetchHooks Function()
+        > {
+  $$AreasTableTableManager(_$AgendumDatabase db, $AreasTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AreasTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AreasTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AreasTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String?> color = const Value.absent(),
+                Value<String> sortKey = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> lamport = const Value.absent(),
+                Value<String> origin = const Value.absent(),
+                Value<int?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AreasCompanion(
+                id: id,
+                name: name,
+                color: color,
+                sortKey: sortKey,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                lamport: lamport,
+                origin: origin,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String name,
+                Value<String?> color = const Value.absent(),
+                required String sortKey,
+                required int createdAt,
+                required int updatedAt,
+                required int lamport,
+                required String origin,
+                Value<int?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AreasCompanion.insert(
+                id: id,
+                name: name,
+                color: color,
+                sortKey: sortKey,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                lamport: lamport,
+                origin: origin,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AreasTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AgendumDatabase,
+      $AreasTable,
+      Area,
+      $$AreasTableFilterComposer,
+      $$AreasTableOrderingComposer,
+      $$AreasTableAnnotationComposer,
+      $$AreasTableCreateCompanionBuilder,
+      $$AreasTableUpdateCompanionBuilder,
+      (Area, BaseReferences<_$AgendumDatabase, $AreasTable, Area>),
+      Area,
+      PrefetchHooks Function()
+    >;
+typedef $$ProjectsTableCreateCompanionBuilder =
+    ProjectsCompanion Function({
+      required String id,
+      Value<String?> parentId,
+      Value<String?> areaId,
+      required String name,
+      Value<String?> note,
+      Value<String> status,
+      Value<int?> reviewCadenceDays,
+      Value<String?> nextActionId,
+      required String sortKey,
+      required int createdAt,
+      required int updatedAt,
+      required int lamport,
+      required String origin,
+      Value<int?> deletedAt,
+      Value<int> rowid,
+    });
+typedef $$ProjectsTableUpdateCompanionBuilder =
+    ProjectsCompanion Function({
+      Value<String> id,
+      Value<String?> parentId,
+      Value<String?> areaId,
+      Value<String> name,
+      Value<String?> note,
+      Value<String> status,
+      Value<int?> reviewCadenceDays,
+      Value<String?> nextActionId,
+      Value<String> sortKey,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+      Value<int> lamport,
+      Value<String> origin,
+      Value<int?> deletedAt,
+      Value<int> rowid,
+    });
+
+class $$ProjectsTableFilterComposer
+    extends Composer<_$AgendumDatabase, $ProjectsTable> {
+  $$ProjectsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get parentId => $composableBuilder(
+    column: $table.parentId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get areaId => $composableBuilder(
+    column: $table.areaId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get reviewCadenceDays => $composableBuilder(
+    column: $table.reviewCadenceDays,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nextActionId => $composableBuilder(
+    column: $table.nextActionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sortKey => $composableBuilder(
+    column: $table.sortKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get lamport => $composableBuilder(
+    column: $table.lamport,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get origin => $composableBuilder(
+    column: $table.origin,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ProjectsTableOrderingComposer
+    extends Composer<_$AgendumDatabase, $ProjectsTable> {
+  $$ProjectsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get parentId => $composableBuilder(
+    column: $table.parentId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get areaId => $composableBuilder(
+    column: $table.areaId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get reviewCadenceDays => $composableBuilder(
+    column: $table.reviewCadenceDays,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nextActionId => $composableBuilder(
+    column: $table.nextActionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sortKey => $composableBuilder(
+    column: $table.sortKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get lamport => $composableBuilder(
+    column: $table.lamport,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get origin => $composableBuilder(
+    column: $table.origin,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ProjectsTableAnnotationComposer
+    extends Composer<_$AgendumDatabase, $ProjectsTable> {
+  $$ProjectsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get parentId =>
+      $composableBuilder(column: $table.parentId, builder: (column) => column);
+
+  GeneratedColumn<String> get areaId =>
+      $composableBuilder(column: $table.areaId, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<int> get reviewCadenceDays => $composableBuilder(
+    column: $table.reviewCadenceDays,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get nextActionId => $composableBuilder(
+    column: $table.nextActionId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get sortKey =>
+      $composableBuilder(column: $table.sortKey, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get lamport =>
+      $composableBuilder(column: $table.lamport, builder: (column) => column);
+
+  GeneratedColumn<String> get origin =>
+      $composableBuilder(column: $table.origin, builder: (column) => column);
+
+  GeneratedColumn<int> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+}
+
+class $$ProjectsTableTableManager
+    extends
+        RootTableManager<
+          _$AgendumDatabase,
+          $ProjectsTable,
+          Project,
+          $$ProjectsTableFilterComposer,
+          $$ProjectsTableOrderingComposer,
+          $$ProjectsTableAnnotationComposer,
+          $$ProjectsTableCreateCompanionBuilder,
+          $$ProjectsTableUpdateCompanionBuilder,
+          (Project, BaseReferences<_$AgendumDatabase, $ProjectsTable, Project>),
+          Project,
+          PrefetchHooks Function()
+        > {
+  $$ProjectsTableTableManager(_$AgendumDatabase db, $ProjectsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ProjectsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ProjectsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ProjectsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String?> parentId = const Value.absent(),
+                Value<String?> areaId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<int?> reviewCadenceDays = const Value.absent(),
+                Value<String?> nextActionId = const Value.absent(),
+                Value<String> sortKey = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> lamport = const Value.absent(),
+                Value<String> origin = const Value.absent(),
+                Value<int?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ProjectsCompanion(
+                id: id,
+                parentId: parentId,
+                areaId: areaId,
+                name: name,
+                note: note,
+                status: status,
+                reviewCadenceDays: reviewCadenceDays,
+                nextActionId: nextActionId,
+                sortKey: sortKey,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                lamport: lamport,
+                origin: origin,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                Value<String?> parentId = const Value.absent(),
+                Value<String?> areaId = const Value.absent(),
+                required String name,
+                Value<String?> note = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<int?> reviewCadenceDays = const Value.absent(),
+                Value<String?> nextActionId = const Value.absent(),
+                required String sortKey,
+                required int createdAt,
+                required int updatedAt,
+                required int lamport,
+                required String origin,
+                Value<int?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ProjectsCompanion.insert(
+                id: id,
+                parentId: parentId,
+                areaId: areaId,
+                name: name,
+                note: note,
+                status: status,
+                reviewCadenceDays: reviewCadenceDays,
+                nextActionId: nextActionId,
+                sortKey: sortKey,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                lamport: lamport,
+                origin: origin,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ProjectsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AgendumDatabase,
+      $ProjectsTable,
+      Project,
+      $$ProjectsTableFilterComposer,
+      $$ProjectsTableOrderingComposer,
+      $$ProjectsTableAnnotationComposer,
+      $$ProjectsTableCreateCompanionBuilder,
+      $$ProjectsTableUpdateCompanionBuilder,
+      (Project, BaseReferences<_$AgendumDatabase, $ProjectsTable, Project>),
+      Project,
       PrefetchHooks Function()
     >;
 typedef $$OplogTableCreateCompanionBuilder =
@@ -3943,6 +5949,10 @@ class $AgendumDatabaseManager {
   $AgendumDatabaseManager(this._db);
   $$TasksTableTableManager get tasks =>
       $$TasksTableTableManager(_db, _db.tasks);
+  $$AreasTableTableManager get areas =>
+      $$AreasTableTableManager(_db, _db.areas);
+  $$ProjectsTableTableManager get projects =>
+      $$ProjectsTableTableManager(_db, _db.projects);
   $$OplogTableTableManager get oplog =>
       $$OplogTableTableManager(_db, _db.oplog);
   $$SyncStateTableTableManager get syncState =>

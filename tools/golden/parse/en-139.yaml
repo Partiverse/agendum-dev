@@ -1,0 +1,8 @@
+id: en-139
+now: "2026-09-19T09:00:00"
+input: "7:30pm or 8pm dinner with parents"
+expect:
+  reminder_time: "19:30"
+  ambiguities_min: 1
+  title_contains: "dinner with parents"
+tags: [en, time, ambiguous, rule_solvable]

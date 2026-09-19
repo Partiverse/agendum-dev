@@ -1,0 +1,8 @@
+# 回归：标签边界不再吞尾随问号。
+id: zh-151
+now: "2026-09-19T09:00:00"
+input: "#灵感? 记录梦境"
+expect:
+  tags: [灵感]
+  title_exact: "记录梦境"
+tags: [zh, tag, ambiguous, rule_solvable]

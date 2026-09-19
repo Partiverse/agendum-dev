@@ -29,6 +29,7 @@ abstract final class TaskFields {
     'actual_minutes': OpValueTypes.intT,
     'energy': OpValueTypes.str,
     'waiting_for': OpValueTypes.str,
+    'project_id': OpValueTypes.str,
     'sort_key': OpValueTypes.str,
   };
 
@@ -64,6 +65,7 @@ abstract final class TaskFields {
         'actual_minutes' => TasksCompanion(actualMinutes: Value(value as int?)),
         'energy' => TasksCompanion(energy: Value(value as String?)),
         'waiting_for' => TasksCompanion(waitingFor: Value(value as String?)),
+        'project_id' => TasksCompanion(projectId: Value(value as String?)),
         'sort_key' => TasksCompanion(sortKey: Value(value as String? ?? '')),
         _ => throw ArgumentError('未知任务字段:$field'),
       };

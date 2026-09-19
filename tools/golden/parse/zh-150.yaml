@@ -1,0 +1,8 @@
+id: zh-150
+now: "2026-09-19T09:00:00"
+input: "#宅家 追剧 #娱乐 一集20分钟"
+expect:
+  tags: [宅家, 娱乐]
+  estimate_minutes: 20
+  title_contains: "追剧"
+tags: [zh, tag, duration, colloquial, rule_solvable]

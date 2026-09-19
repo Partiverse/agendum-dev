@@ -1,0 +1,8 @@
+id: en-142
+now: "2026-09-19T09:00:00"
+input: "6:00am or 6:30 alarm"
+expect:
+  reminder_time: "06:00"
+  ambiguities_min: 1
+  title_contains: "alarm"
+tags: [en, time, ambiguous, rule_solvable]

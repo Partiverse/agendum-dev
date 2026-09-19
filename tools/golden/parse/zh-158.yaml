@@ -1,0 +1,8 @@
+id: zh-158
+now: "2026-09-19T09:00:00"
+input: "12月1日和1月1日各交一份总结"
+expect:
+  due_date: "2026-12-01"
+  ambiguities_min: 1
+  title_contains: "各交一份总结"
+tags: [zh, date, ambiguous, rule_solvable]

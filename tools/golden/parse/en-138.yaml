@@ -1,0 +1,7 @@
+id: en-138
+now: "2026-09-19T09:00:00"
+input: "in 21 days finish 5k training"
+expect:
+  due_date: "2026-10-10"
+  title_contains: "5k training"
+tags: [en, date, easy, rule_solvable]

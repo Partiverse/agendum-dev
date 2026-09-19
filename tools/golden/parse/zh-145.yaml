@@ -1,0 +1,9 @@
+# 回归：日期后"…前"标记截止语义。
+id: zh-145
+now: "2026-09-19T09:00:00"
+input: "10月18日前报名马拉松"
+expect:
+  due_date: "2026-10-18"
+  is_deadline: true
+  title_contains: "报名马拉松"
+tags: [zh, date, deadline, easy, rule_solvable]

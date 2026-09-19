@@ -1,0 +1,9 @@
+id: zh-154
+now: "2026-09-19T09:00:00"
+input: "明天上午10点半和下午3点各取一次件"
+expect:
+  due_date: "2026-09-20"
+  due_time: "10:30"
+  ambiguities_min: 1
+  title_contains: "各取一次件"
+tags: [zh, date, time, ambiguous, rule_solvable]

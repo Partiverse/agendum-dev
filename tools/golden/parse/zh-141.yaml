@@ -1,0 +1,9 @@
+# 回归：口语时段词"今晚"+时刻 → 22:00（v0 曾误判 10:00）。
+id: zh-141
+now: "2026-09-19T09:00:00"
+input: "今晚10点跑步"
+expect:
+  due_date: "2026-09-19"
+  due_time: "22:00"
+  title_exact: "跑步"
+tags: [zh, date, time, colloquial, rule_solvable]

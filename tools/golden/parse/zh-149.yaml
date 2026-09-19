@@ -1,0 +1,8 @@
+id: zh-149
+now: "2026-09-19T09:00:00"
+input: "下午4点还是4点半牙医"
+expect:
+  reminder_time: "16:00"
+  ambiguities_min: 1
+  title_contains: "牙医"
+tags: [zh, time, ambiguous, rule_solvable]

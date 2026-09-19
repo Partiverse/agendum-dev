@@ -1,0 +1,7 @@
+id: zh-148
+now: "2026-09-19T09:00:00"
+input: "11点45分热车"
+expect:
+  reminder_time: "11:45"
+  title_exact: "热车"
+tags: [zh, time, easy, rule_solvable]

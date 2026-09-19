@@ -5,4 +5,4 @@ input: "oct 3 book flights"
 expect:
   due_date: "2026-10-03"
   title_contains: "book flights"
-tags: [en, date, easy, needs_system_model]
+tags: [en, date, easy, 对抗, needs_system_model]
