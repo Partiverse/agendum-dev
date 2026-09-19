@@ -56,4 +56,4 @@
 | 2026-09-19 | **同步引擎 PoC 落地（W5–6 提前）** | 03 文档 §4 协议在 `apps/server` 实现：SyncStore 抽象 + 内存/Postgres 双实现（sync_ops + entity_lamport 裁决表）、push/pull 真实端点；双客户端收敛 PoC 测试 6 场景全过；PG 集成测试 + 端到端 curl 冒烟通过（`make up` 起 PG，宿主机 5433）；E2EE 密文化留待 S08 |
 | 2026-09-19 | **AI 网关骨架 + 端云链路打通** | `/v1/ai/parse` 云端回落端点：分级强制（L2/L3 须 BYOK 否则 403）、月度额度账本（429）、可插拔适配器、prompt_version 回显；演示页可从浏览器直连真实服务端体验完整端云流程 |
 | 2026-09-19 | **Flutter SDK 就位 + 风格样板落地（W7–8 提前）** | Flutter 3.47.4（国内镜像安装，锁定版本）；`apps/client` 接入 workspace：捕获条（实时解析预览，真实 nlp 引擎）/收件箱/今日视图（"现在，做这件事"）三屏，亮暗双主题，4 个 widget 测试全绿；`make ci` 升级为全 flutter 工具链（8 套件全绿） |
-| 待办 | macOS/iOS 真机构建（需 Xcode + CocoaPods） | `flutter run` 走查前的环境准备；W7–8 风格走查清单执行 |
+| 2026-09-19 | **macOS 真机走查通过** | Xcode 27.0 + CocoaPods 环境，`flutter build macos --debug` 成功并启动真实窗口；走查三项全过：①捕获条输入自然语言→解析预览 chips 实时渲染→回车入库（含日期/时长/精力元信息）；②今日视图焦点卡"现在，做这件事"+ 接下来列表；③完成任务→移出今日、收件箱保留删除线、徽标更新。设计红线（状态走 transition）在真机验证 |
