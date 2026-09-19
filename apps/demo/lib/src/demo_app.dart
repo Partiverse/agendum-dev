@@ -10,6 +10,7 @@ import 'package:agendum_protocol/agendum_protocol.dart';
 import 'package:agendum_sync/agendum_sync.dart';
 import 'package:web/web.dart' as web;
 
+import 'cloud.dart';
 import 'format.dart';
 
 web.HTMLElement _el(String tag, [String? cls, String? text]) {
@@ -138,7 +139,95 @@ void buildCapture(web.HTMLElement pane) {
   pane.append(chipRow);
   pane.append(input);
   pane.append(out);
+
+  // 云端回落演示：同一输入经真实服务端 /v1/ai/parse（分级 + 额度 + 适配器）。
+  final cloudRow = _el('div', 'chip-row');
+  final cloudBtn = _el('button', 'chip accent', '☁ 发送到云端网关（L1）');
+  final cloudNote = _el(
+    'span',
+    'hint',
+    '端上置信度不足时的回落路径——请求发往 localhost:8090 的真实服务端。',
+  );
+  final cloudOut = _el('div');
+  _onClick(cloudBtn, () async {
+    _clear(cloudOut);
+    if (input.value.trim().isEmpty) {
+      cloudOut.append(_el('div', 'hint', '先在上方输入内容'));
+      return;
+    }
+    cloudOut.append(_el('div', 'hint', '请求中…'));
+    try {
+      final r = await callCloudParse(input.value);
+      _clear(cloudOut);
+      cloudOut.append(_renderCloudResponse(r));
+    } catch (_) {
+      _clear(cloudOut);
+      cloudOut.append(
+        _el(
+          'div',
+          'amb-item',
+          '✗ 无法连接服务端（启动方式：make up 后 '
+              'DATABASE_URL=… dart run apps/server/bin/server.dart）',
+        ),
+      );
+    }
+  });
+  cloudRow.append(cloudBtn);
+  cloudRow.append(cloudNote);
+  pane.append(cloudRow);
+  pane.append(cloudOut);
   reparse();
+}
+
+web.HTMLElement _renderCloudResponse(Map<String, Object?> r) {
+  final wrap = _el('div', 'capture-result');
+  final head = _el('div', 'card');
+  head.append(
+    _el(
+      'div',
+      'card-label',
+      '服务端响应 · adapter=${r['adapter']} · prompt=${r['prompt_version']}',
+    ),
+  );
+  final q = r['quota'] as Map? ?? {};
+  head.append(
+    _el(
+      'div',
+      'card-value',
+      '本月额度 ${q['used']}/${q['limit']}（剩 ${q['remaining']}）',
+    ),
+  );
+  wrap.append(head);
+
+  final grid = _el('div', 'card-grid');
+  void field(String label, Object? value) {
+    if (value == null || value.toString().isEmpty) return;
+    final c = _el('div', 'card');
+    c.append(_el('div', 'card-label', label));
+    c.append(_el('div', 'card-value', value.toString()));
+    grid.append(c);
+  }
+
+  final result = r['result'] as Map? ?? {};
+  field('标题', result['title']);
+  final dueDay = result['due_day'];
+  if (dueDay is int) field('截止日', formatEpochDay(dueDay));
+  field('预计时长（分钟）', result['estimate_minutes']);
+  field(
+    '精力',
+    result['energy'] == 'high'
+        ? '!高精力'
+        : result['energy'] == 'low'
+        ? '!低精力'
+        : null,
+  );
+  final tags = result['tags'];
+  if (tags is List && tags.isNotEmpty) {
+    field('标签', tags.map((t) => '#$t').join('  '));
+  }
+  field('置信度', result['confidence']);
+  wrap.append(grid);
+  return wrap;
 }
 
 web.HTMLElement _renderCapture(ParsedCapture r) {

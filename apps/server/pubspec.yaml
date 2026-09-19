@@ -7,6 +7,8 @@ environment:
   sdk: ^3.10.0
 
 dependencies:
+  agendum_nlp:
+    ^0.0.1
   agendum_protocol:
     ^0.0.1
   meta: ^1.15.0

@@ -53,6 +53,21 @@ class ParsedCapture {
 
   bool get hasDue => dueDay != null || dueAtMs != null;
 
+  /// 网关响应用的 JSON 形态（字段名 snake_case，与协议风格一致）。
+  Map<String, Object?> toJson() => {
+    'title': title,
+    'confidence': confidence,
+    if (dueDay != null) 'due_day': dueDay,
+    if (dueAtMs != null) 'due_at_ms': dueAtMs,
+    if (reminderAtMs != null) 'reminder_at_ms': reminderAtMs,
+    if (estimateMinutes != null) 'estimate_minutes': estimateMinutes,
+    if (energy != null) 'energy': energy,
+    'tags': tags,
+    if (projectHint != null) 'project_hint': projectHint,
+    'is_deadline': isDeadline,
+    'ambiguities': ambiguities,
+  };
+
   @override
   String toString() =>
       'ParsedCapture($title, dueDay=$dueDay, dueAt=$dueAtMs, '
