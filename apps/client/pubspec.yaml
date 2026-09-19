@@ -1,0 +1,23 @@
+name: agendum_client
+description: 程簿客户端（Flutter）—— Phase 0 W7–8 风格样板：捕获条/收件箱/今日视图。
+version: 0.0.1
+publish_to: none
+resolution: workspace
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  agendum_domain:
+    ^0.0.1
+  agendum_nlp:
+    ^0.0.1
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true

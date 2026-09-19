@@ -9,22 +9,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: dart-lang/setup-dart@v1
+      - uses: subosito/flutter-action@v2
         with:
-          sdk: '3.10.6'
-      - name: Pub get（workspace）
-        run: dart pub get
+          flutter-version: 3.47.4
+          channel: stable
+          cache: true
+      - name: Pub get（workspace，flutter 解析含客户端）
+        run: flutter pub get
       - name: Format check
         run: dart format --output=none --set-exit-if-changed .
-      - name: Analyze
+      - name: Analyze（全工作区，flutter 工具链）
         run: |
-          for p in packages/domain packages/protocol packages/sync packages/nlp apps/server tools/eval; do
-            dart analyze --fatal-infos "$p" || exit 1
+          for p in packages/domain packages/protocol packages/sync packages/nlp apps/server apps/demo apps/client tools/eval; do
+            (cd "$p" && flutter analyze --fatal-infos) || exit 1
           done
-      - name: Test
+      - name: Test（flutter test 兼容纯 Dart 包）
         run: |
-          for p in packages/domain packages/protocol packages/sync packages/nlp apps/server tools/eval; do
-            dart test "$p" || exit 1
+          for p in packages/domain packages/protocol packages/sync packages/nlp apps/server apps/demo apps/client tools/eval; do
+            (cd "$p" && flutter test) || exit 1
           done
       - name: Golden eval（replay/本地，零 API 成本）
         run: dart run tools/eval/bin/eval.dart run --engine parse --min 0.75

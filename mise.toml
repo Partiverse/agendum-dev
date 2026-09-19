@@ -1,4 +1,8 @@
-# 工具链版本锁定（02 文档 §2：版本策略）。`mise install` 可复现环境。
+# 工具链版本（02 文档 §2：版本策略）
+# 实际管控方式：brew（flutter cask / dart-sdk formula）——mise 待团队统一后启用。
+# flutter = 3.47.5 stable（brew install --cask flutter）
+# dart    = 3.10.6 stable（brew install dart-sdk）
+# 升级走独立 PR + 全量回归（含 flutter test）。
 [tools]
-dart = "3.10.6"
-# flutter = "待 S05 前锁定并记录于此（fvm 亦可，见 05 文档 W7-8）"
+# dart = "3.10.6"        # 启用 mise 管控时打开
+# flutter = "3.47.5"     # 经 asdf-flutter 插件支持，暂用 brew

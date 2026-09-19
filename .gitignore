@@ -5,6 +5,13 @@ dist/
 coverage/
 pubspec_overrides.yaml
 apps/demo/web/main.dart.js
+**/ios/Flutter/.last_build_id
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/macos/Flutter/Flutter.framework
+**/macos/Flutter/Flutter.podspec
+**/macos/Flutter/ephemeral/
+**/ios/Flutter/ephemeral/
 
 # IDE
 .idea/
