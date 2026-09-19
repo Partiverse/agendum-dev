@@ -1,0 +1,8 @@
+id: en-001
+now: "2026-09-19T09:00:00"
+input: "tomorrow 2pm standup"
+expect:
+  due_date: "2026-09-20"
+  due_time: "14:00"
+  title_exact: "standup"
+tags: [en, date, time]

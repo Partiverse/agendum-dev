@@ -1,0 +1,11 @@
+name: agendum_protocol
+description: 客户端/服务端共享契约 —— oplog 消息、同步接口、AI 工具 schema（02 文档 §1）。
+version: 0.0.1
+publish_to: none
+resolution: workspace
+environment:
+  sdk: ^3.10.0
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.0

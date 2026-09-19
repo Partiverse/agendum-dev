@@ -1,0 +1,7 @@
+id: zh-014
+now: "2026-09-19T09:00:00"
+input: "45分钟 整理发票"
+expect:
+  estimate_minutes: 45
+  title_contains: "整理发票"
+tags: [zh, duration]

@@ -1,0 +1,7 @@
+id: zh-012
+now: "2026-09-19T09:00:00"
+input: "下午4点半取快递"
+expect:
+  reminder_time: "16:30"
+  title_exact: "取快递"
+tags: [zh, time-only]

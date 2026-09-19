@@ -1,0 +1,15 @@
+name: agendum_nlp
+description: 端上捕获解析规则引擎 v0 —— 零依赖、离线、确定性（04 文档 §4；ADR-006）。
+version: 0.0.1
+publish_to: none
+resolution: workspace
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  agendum_domain:
+    ^0.0.1
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.0

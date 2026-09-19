@@ -1,0 +1,8 @@
+id: en-003
+now: "2026-09-19T09:00:00"
+input: "review PR 30min !low"
+expect:
+  estimate_minutes: 30
+  energy: low
+  title_exact: "review PR"
+tags: [en, duration, energy]

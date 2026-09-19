@@ -1,0 +1,10 @@
+id: zh-001
+now: "2026-09-19T09:00:00"
+input: "下周三下午3点前给司机发合同 30min !高精力"
+expect:
+  due_date: "2026-09-23"
+  due_time: "15:00"
+  estimate_minutes: 30
+  energy: high
+  title_exact: "给司机发合同"
+tags: [zh, date, time, energy, duration, deadline]

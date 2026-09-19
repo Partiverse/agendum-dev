@@ -1,0 +1,17 @@
+name: agendum_server
+description: 程簿服务端骨架 —— 同步/账号/AI 网关（03 文档 §4.2；S05 起按 ADR-003 演进为 Dart Frog）。
+version: 0.0.1
+publish_to: none
+resolution: workspace
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  agendum_protocol:
+    ^0.0.1
+  shelf: ^1.4.1
+  shelf_router: ^1.1.4
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.0

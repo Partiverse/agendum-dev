@@ -1,0 +1,7 @@
+id: zh-005
+now: "2026-09-19T09:00:00"
+input: "@程簿 写周报"
+expect:
+  project_hint: "程簿"
+  title_exact: "写周报"
+tags: [zh, project]

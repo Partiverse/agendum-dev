@@ -1,0 +1,19 @@
+name: agendum_eval
+description: 黄金评估集 harness（04 文档 §6）—— 支持 replay/本地适配器，CI 零 API 成本。
+version: 0.0.1
+publish_to: none
+resolution: workspace
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  agendum_domain:
+    ^0.0.1
+  agendum_nlp:
+    ^0.0.1
+  args: ^2.5.0
+  yaml: ^3.1.2
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.0

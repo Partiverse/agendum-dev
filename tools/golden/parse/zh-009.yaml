@@ -1,0 +1,7 @@
+id: zh-009
+now: "2026-09-19T09:00:00"
+input: "9月25日交保险"
+expect:
+  due_date: "2026-09-25"
+  title_contains: "交保险"
+tags: [zh, absolute-date]

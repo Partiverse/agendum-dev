@@ -1,0 +1,23 @@
+# Dart / Flutter
+.dart_tool/
+build/
+dist/
+coverage/
+pubspec_overrides.yaml
+
+# IDE
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+
+# 环境与密钥（02 文档 §6：密钥禁止入库）
+.env
+.env.*
+*.keystore
+*.p12
+*.mobileprovision
+
+# 系统文件
+.DS_Store
+Thumbs.db

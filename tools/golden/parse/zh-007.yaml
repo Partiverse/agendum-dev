@@ -1,0 +1,7 @@
+id: zh-007
+now: "2026-09-16T09:00:00"
+input: "周三 跑步"
+expect:
+  due_date: "2026-09-16"
+  title_exact: "跑步"
+tags: [zh, weekday, today-included]

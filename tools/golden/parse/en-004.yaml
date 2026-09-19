@@ -1,0 +1,7 @@
+id: en-004
+now: "2026-09-19T09:00:00"
+input: "watch the sunset today"
+expect:
+  due_date: "2026-09-19"
+  title_exact: "watch the sunset"
+tags: [en, negative,对抗]

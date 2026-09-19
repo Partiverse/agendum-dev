@@ -1,0 +1,6 @@
+id: zh-003
+now: "2026-09-19T09:00:00"
+input: "买牛奶"
+expect:
+  title_exact: "买牛奶"
+tags: [zh, plain]

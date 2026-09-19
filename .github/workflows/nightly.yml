@@ -1,0 +1,27 @@
+name: nightly
+on:
+  schedule:
+    - cron: '0 18 * * *' # UTC 18:00 = 北京时间次日 02:00
+  workflow_dispatch:
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.10.6'
+      - run: dart pub get
+      - name: 全量测试
+        run: |
+          for p in packages/domain packages/protocol packages/sync packages/nlp apps/server tools/eval; do
+            dart test "$p" || exit 1
+          done
+      - name: 评估集回归（真跑，预算受 secret 保护）
+        if: ${{ vars.EVAL_LIVE_ENABLED == 'true' }}
+        run: echo "live 评估接入点：云端适配器就绪后启用（04 文档 §6.2）"
+      - name: 同步混沌套件（占位：S08 接入 02 文档 §7.2 全场景）
+        run: echo "chaos suite placeholder"
+      - name: 性能基准（占位：S11 接入 tools/seed + 基准）
+        run: echo "perf bench placeholder"

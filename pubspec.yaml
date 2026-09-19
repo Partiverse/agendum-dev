@@ -1,0 +1,17 @@
+name: agendum
+publish_to: none
+description: 程簿（Agendum）monorepo 工作区根 —— Dart pub workspaces（ADR-015）。
+environment:
+  sdk: ^3.10.0
+workspace:
+  - packages/domain
+  - packages/protocol
+  - packages/sync
+  - packages/nlp
+  - apps/server
+  - tools/eval
+# 暂不入工作区（依赖未落地时加入会破坏解析）：
+#   packages/db      → S05 引入 Drift 后加入
+#   packages/ui      → Flutter SDK 就绪后加入
+#   apps/client      → S05 `flutter create` 后加入
+#   packages/ai_client / tools/seed → 首个真实代码落地时加入

@@ -1,0 +1,7 @@
+id: zh-008
+now: "2026-09-19T09:00:00"
+input: "下下周五 提交季度报告"
+expect:
+  due_date: "2026-10-02"
+  title_contains: "提交季度报告"
+tags: [zh, weekday]

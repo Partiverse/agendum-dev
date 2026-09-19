@@ -1,0 +1,11 @@
+name: agendum_domain
+description: GTD 领域规则引擎 —— 纯 Dart，零 UI/DB 依赖（02 文档 §1 依赖规则）。
+version: 0.0.1
+publish_to: none
+resolution: workspace
+environment:
+  sdk: ^3.10.0
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.0
