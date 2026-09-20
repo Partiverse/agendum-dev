@@ -42,7 +42,10 @@ void main() {
     await tester.pumpWidget(app(store));
     await tester.pumpAndSettle();
 
-    final t = store.inboxTasks.single; // '读《搞定Ⅰ》第 2 章'
+    // 在库内建一个纯净任务，避开 rich seed 遗留的 done 任务。
+    await store.addManual('纯净测试任务');
+    await tester.pumpAndSettle();
+    final t = store.inboxTasks.firstWhere((x) => x.title == '纯净测试任务');
     expect(t.isDone, isFalse);
     await tester.tap(find.byKey(ValueKey('check-${t.id}')));
     await tester.pumpAndSettle();

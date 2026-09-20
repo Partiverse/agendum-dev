@@ -4,7 +4,8 @@
 /// 字段裁决表，pull 按 cursor 增量续传。AI 网关（04 文档 §5.2）提供
 /// `/v1/ai/parse` 云端回落端点：分级强制 + 额度账本 + 可插拔适配器。
 /// 存储经 [SyncStore] 抽象——默认内存实现，设 DATABASE_URL 时用
-/// Postgres（bin/server.dart 装配）。E2EE 于 S08 落地。错误响应统一 JSON。
+/// Postgres（bin/server.dart 装配）。S07 起提供 `/v1/devices/register`
+/// 设备注册（E2EE 密钥指纹绑定,03 文档 §6.1）。错误响应统一 JSON。
 library;
 
 import 'dart:convert';
@@ -17,6 +18,7 @@ import 'ai/adapter.dart';
 import 'ai/quota.dart';
 import 'ai/routes.dart';
 import 'middleware.dart';
+import 'store/devices.dart';
 import 'store/memory_store.dart';
 import 'store/sync_store.dart';
 
@@ -28,12 +30,14 @@ Response _json(Object? body, {int status = 200}) => Response(
 
 Handler buildHandler({
   SyncStore? store,
+  DeviceDirectory? devices,
   CaptureModelAdapter? aiAdapter,
   QuotaLedger? quotaLedger,
   int aiMonthlyLimit = 30,
   String version = '0.0.1',
 }) {
   final sync = store ?? MemorySyncStore();
+  final deviceDir = devices ?? MemoryDeviceDirectory();
   final adapter = aiAdapter ?? ServerRulesAdapter();
   final ai = aiRoutes(
     adapter: adapter,
@@ -87,6 +91,41 @@ Handler buildHandler({
           int.tryParse(req.url.queryParameters['limit'] ?? '') ?? 2000;
       final resp = await sync.pull(since: since, limit: limit);
       return _json(resp.toJson());
+    })
+    ..post('/v1/devices/register', (Request req) async {
+      final Map<String, Object?> body;
+      try {
+        body = (jsonDecode(await req.readAsString()) as Map)
+            .cast<String, Object?>();
+      } on FormatException {
+        return _json({
+          'error': 'bad_request',
+          'message': 'body 不是合法 JSON',
+        }, status: 400);
+      }
+      final DeviceRegistrationRequest regReq;
+      try {
+        regReq = DeviceRegistrationRequest.fromJson(body);
+      } on FormatException catch (e) {
+        return _json({
+          'error': 'bad_request',
+          'message': e.message,
+        }, status: 400);
+      }
+      try {
+        final resp = await deviceDir.register(regReq);
+        return _json(resp.toJson());
+      } on FingerprintMismatch catch (e) {
+        return _json({
+          'error': 'fingerprint_mismatch',
+          'message': e.toString(),
+        }, status: 400);
+      } on ArgumentError catch (e) {
+        return _json({
+          'error': 'bad_request',
+          'message': e.message ?? '非法参数',
+        }, status: 400);
+      }
     })
     // catch-all 路由须最后注册，AI 网关内部自带 404 兜底。
     ..mount('/', ai.call);

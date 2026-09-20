@@ -209,13 +209,32 @@ class _InboxPane extends StatelessWidget {
         else
           Card(
             clipBehavior: Clip.antiAlias,
-            child: Column(
-              children: [
-                for (final t in tasks) ...[
-                  TaskRow(task: t, store: store),
-                  if (t != tasks.last) const Divider(indent: 52),
-                ],
-              ],
+            child: ReorderableListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              buildDefaultDragHandles: false,
+              itemCount: tasks.length,
+              onReorderItem: (oldIndex, newIndex) {
+                // onReorderItem 的 newIndex 已按"移除后"修正,直接搬移即可。
+                final next = [...tasks];
+                final moved = next.removeAt(oldIndex);
+                next.insert(newIndex, moved);
+                store.reorderTasks([for (final t in next) t.id]);
+              },
+              itemBuilder: (context, i) {
+                final t = tasks[i];
+                return Column(
+                  key: ValueKey('reorder-${t.id}'),
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ReorderableDelayedDragStartListener(
+                      index: i,
+                      child: TaskRow(task: t, store: store),
+                    ),
+                    if (i != tasks.length - 1) const Divider(indent: 52),
+                  ],
+                );
+              },
             ),
           ),
       ],

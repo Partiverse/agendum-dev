@@ -1,6 +1,6 @@
 # 程簿（Agendum）monorepo 任务编排 —— 使用方式见 02 文档 §9。
 # 纯 Dart 包用 dart 工具链；Flutter 包（apps/client）用 flutter 工具链。
-MEMBERS := packages/domain packages/db packages/protocol packages/sync packages/nlp apps/server apps/demo tools/eval
+MEMBERS := packages/domain packages/db packages/protocol packages/sync packages/e2ee packages/nlp apps/server apps/demo tools/eval
 
 .PHONY: bootstrap analyze test fmt fmt-check eval ci up down demo demo-build flutter-check clean
 

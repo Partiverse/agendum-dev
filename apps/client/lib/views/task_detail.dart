@@ -68,6 +68,8 @@ class TaskDetailSheet extends StatelessWidget {
                   _EnergyRow(task: task, store: store),
                   _ProjectRow(task: task, store: store),
                   const Divider(height: 24),
+                  _TagSection(task: task, store: store),
+                  const Divider(height: 24),
                   _StatusChips(task: task, store: store),
                 ],
               ),
@@ -286,6 +288,200 @@ class _ProjectRow extends StatelessWidget {
           onChanged: (v) => store.setTaskProject(task.id, v),
         ),
       ],
+    );
+  }
+}
+
+/// 标签区:已挂标签(点 ✕ 摘除)+ 候选标签(互斥冲突置灰禁点)+ 内联建标签。
+/// 互斥校验在仓库层(TagRepository.assignTag),此处只做前置置灰与错误提示,
+/// 避免用户点了才知道不合法;但红线仍在领域层,UI 不做唯一裁决。
+class _TagSection extends StatefulWidget {
+  const _TagSection({required this.task, required this.store});
+
+  final TaskItem task;
+  final TaskStore store;
+
+  @override
+  State<_TagSection> createState() => _TagSectionState();
+}
+
+class _TagSectionState extends State<_TagSection> {
+  final _newTag = TextEditingController();
+  var _creating = false;
+
+  @override
+  void dispose() {
+    _newTag.dispose();
+    super.dispose();
+  }
+
+  Future<void> _run(Future<void> Function() op) async {
+    try {
+      await op();
+    } on ExclusiveTagGroupError catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '「${e.existing.groupName ?? '互斥组'}」已含「${e.existing.name}」，'
+              '不能再加「${e.candidate.name}」',
+            ),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final task = widget.task;
+    final store = widget.store;
+    final assigned = task.tags;
+    final assignedIds = {for (final t in assigned) t.id};
+    final candidates = [
+      for (final t in store.tagCatalog)
+        if (!assignedIds.contains(t.id)) t,
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(
+              Icons.sell_outlined,
+              size: 18,
+              color: scheme.onSurface.withValues(alpha: .5),
+            ),
+            const SizedBox(width: 8),
+            const Text('标签', style: TextStyle(fontSize: 14)),
+            const Spacer(),
+            if (!_creating)
+              TextButton.icon(
+                onPressed: () => setState(() => _creating = true),
+                icon: const Icon(Icons.add, size: 16),
+                label: const Text('新建', style: TextStyle(fontSize: 13)),
+              ),
+          ],
+        ),
+        if (assigned.isEmpty)
+          Padding(
+            padding: const EdgeInsets.only(left: 26, top: 2),
+            child: Text(
+              '暂无标签',
+              style: TextStyle(
+                fontSize: 13,
+                color: scheme.onSurface.withValues(alpha: .45),
+              ),
+            ),
+          )
+        else
+          Padding(
+            padding: const EdgeInsets.only(left: 26, top: 4),
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              children: [
+                for (final t in assigned)
+                  InputChip(
+                    label: Text(t.name, style: const TextStyle(fontSize: 12)),
+                    avatar: t.groupId == null
+                        ? null
+                        : Icon(
+                            Icons.label_outline,
+                            size: 14,
+                            color: scheme.primary,
+                          ),
+                    onDeleted: () =>
+                        _run(() => store.unassignTag(task.id, t.id)),
+                    deleteIcon: const Icon(Icons.close, size: 14),
+                  ),
+              ],
+            ),
+          ),
+        if (_creating)
+          Padding(
+            padding: const EdgeInsets.only(left: 26, top: 4),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    key: const ValueKey('new-tag-field'),
+                    controller: _newTag,
+                    autofocus: true,
+                    style: const TextStyle(fontSize: 13),
+                    decoration: const InputDecoration(
+                      hintText: '新标签名,回车创建',
+                      isDense: true,
+                    ),
+                    onSubmitted: (v) async {
+                      final name = v.trim();
+                      if (name.isNotEmpty) {
+                        final tag = await store.createTag(name);
+                        await _run(() => store.assignTag(task.id, tag.id));
+                      }
+                      _newTag.clear();
+                      if (mounted) setState(() => _creating = false);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        if (candidates.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(left: 26, top: 8),
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              children: [
+                for (final t in candidates)
+                  _CandidateChip(
+                    tag: t,
+                    blocked: _blocked(t, assigned),
+                    onTap: () => _run(() => store.assignTag(task.id, t.id)),
+                  ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  /// 互斥组已有同组标签 → 前置置灰(仍以领域红线为最终裁决)。
+  bool _blocked(TagDescriptor candidate, List<TagDescriptor> assigned) {
+    if (!candidate.groupExclusive) return false;
+    return assigned.any(
+      (t) => t.groupId != null && t.groupId == candidate.groupId,
+    );
+  }
+}
+
+class _CandidateChip extends StatelessWidget {
+  const _CandidateChip({
+    required this.tag,
+    required this.blocked,
+    required this.onTap,
+  });
+
+  final TagDescriptor tag;
+  final bool blocked;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Tooltip(
+      message: blocked ? '同组「${tag.groupName}」已有标签' : '点击挂上',
+      child: ActionChip(
+        label: Text(tag.name, style: const TextStyle(fontSize: 12)),
+        onPressed: blocked ? null : onTap,
+        side: BorderSide(
+          color: scheme.outlineVariant.withValues(alpha: blocked ? .3 : 1),
+        ),
+      ),
     );
   }
 }

@@ -80,4 +80,56 @@ void main() {
       expect(zeroth.compareTo(first), lessThan(0));
     });
   });
+
+  group('rebalancedSortKeys', () {
+    test('空列表与非法入参', () {
+      expect(rebalancedSortKeys(0), isEmpty);
+      expect(() => rebalancedSortKeys(-1), throwsArgumentError);
+    });
+
+    test('单键居中且可向两端扩展', () {
+      final keys = rebalancedSortKeys(1);
+      expect(keys, hasLength(1));
+      expect(prependSortKey(keys.first).compareTo(keys.first), lessThan(0));
+      expect(appendSortKey(keys.first).compareTo(keys.first), greaterThan(0));
+    });
+
+    test('全序且等距（字典序 = 序）', () {
+      for (final n in [2, 5, 61, 62, 100, 3843]) {
+        final keys = rebalancedSortKeys(n);
+        expect(keys, hasLength(n), reason: 'n=$n');
+        for (var i = 1; i < n; i++) {
+          expect(
+            keys[i - 1].compareTo(keys[i]),
+            lessThan(0),
+            reason: 'n=$n keys[$i-1] < keys[$i]',
+          );
+        }
+      }
+    });
+
+    test('键长不超过 maxSortKeyLength', () {
+      for (final k in rebalancedSortKeys(1000)) {
+        expect(k.length, lessThanOrEqualTo(maxSortKeyLength));
+      }
+    });
+
+    test('宽度跨越 62 的幂时仍留间隙（首键 > 空、末键 < 满）', () {
+      final keys = rebalancedSortKeys(62);
+      expect(keys.first.compareTo(''), greaterThan(0));
+      // 定宽 2 位：末键必须小于最大两位串 'zz'，否则后续 prepend 无空间。
+      expect(keys.last.compareTo('zz'), lessThan(0));
+    });
+
+    test('可作为 midpointSortKey 的界继续插入', () {
+      final keys = rebalancedSortKeys(10);
+      final head = midpointSortKey(null, keys.first);
+      expect(head.compareTo(keys.first), lessThan(0));
+      final tail = midpointSortKey(keys.last, null);
+      expect(tail.compareTo(keys.last), greaterThan(0));
+      final mid = midpointSortKey(keys[3], keys[4]);
+      expect(mid.compareTo(keys[3]), greaterThan(0));
+      expect(mid.compareTo(keys[4]), lessThan(0));
+    });
+  });
 }

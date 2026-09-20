@@ -15,12 +15,14 @@ import 'package:uuid/uuid.dart';
 import 'database.dart';
 import 'local_sync_store.dart';
 import 'project_fields.dart';
+import 'task_repository.dart';
 
 class ProjectRepository {
-  ProjectRepository(this._db, this._sync);
+  ProjectRepository(this._db, this._sync, this._tasks);
 
   final AgendumDatabase _db;
   final DriftLocalSyncStore _sync;
+  final TaskRepository _tasks;
 
   // ---- 写路径 ----
 
@@ -152,6 +154,34 @@ class ProjectRepository {
         transitionProject(ProjectStatus.fromValue(row.status), target);
         await editProject(id, {'status': target.value});
       });
+
+  /// 项目删除(S07 关系完整性):软删墓碑(__row del),项目内任务回收件箱
+  /// (见 [TaskRepository.recycleTasksFromProject]:活跃任务回 inbox,
+  /// waiting/done 保持状态,project_id 一律置空)。幂等:已删返回 0。
+  Future<int> deleteProject(String id) => _db.transaction(() async {
+    final row = await _projectById(id);
+    if (row.deletedAt != null) return 0;
+    final recycled = await _tasks.recycleTasksFromProject(id);
+    final lamport = await _sync.tick();
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await (_db.update(_db.projects)..where((p) => p.id.equals(id))).write(
+      ProjectsCompanion(
+        lamport: Value(lamport),
+        origin: Value(_sync.deviceId),
+        updatedAt: Value(now),
+        deletedAt: Value(now),
+      ),
+    );
+    await _appendOp(
+      entity: ProjectFields.entity,
+      entityId: id,
+      field: rowCreateField,
+      type: SyncOpType.del,
+      lamport: lamport,
+    );
+    await _putMirror(ProjectFields.entity, id, rowCreateField, lamport, 'del');
+    return recycled;
+  });
 
   Future<void> renameProject(String id, String name) =>
       editProject(id, {'name': name});
@@ -305,6 +335,7 @@ class ProjectRepository {
     required String entityId,
     required String field,
     required int lamport,
+    SyncOpType type = SyncOpType.set,
     OpValue? value,
   }) async {
     await _db
@@ -316,7 +347,7 @@ class ProjectRepository {
             entity: entity,
             entityId: entityId,
             field: field,
-            op: syncOpTypeToJson(SyncOpType.set),
+            op: syncOpTypeToJson(type),
             valueBlob: value == null
                 ? const Value.absent()
                 : Value(jsonEncode(value.toJson())),

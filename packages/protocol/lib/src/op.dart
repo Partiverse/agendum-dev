@@ -41,6 +41,10 @@ abstract final class OpValueTypes {
   static const date = 'date'; // epoch days
   static const ms = 'ms'; // epoch ms
   static const json = 'json';
+
+  /// E2EE 密文（S07）：v = {n: nonce, c: ciphertext, m: mac}（base64）。
+  /// 服务端不解读，按不透明负载转发（03 文档 §6.2）。
+  static const enc = 'enc';
 }
 
 /// 带类型标签的字段值：`{"t": "date", "v": 20650}`。

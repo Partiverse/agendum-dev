@@ -25,12 +25,20 @@ Future<void> main() async {
 
 /// 客户端入口:Things 级质感走查的载体(05 文档 W7–8)。
 class AgendumApp extends StatelessWidget {
-  const AgendumApp({super.key, required this.store, this.fontFamily});
+  const AgendumApp({
+    super.key,
+    required this.store,
+    this.fontFamily,
+    this.themeMode,
+  });
 
   final TaskStore store;
 
   /// golden 走查注入系统 CJK 字体用(生产为 null 走平台默认)。
   final String? fontFamily;
+
+  /// golden 走查强制明/暗色用(生产为 null 跟随系统)。
+  final ThemeMode? themeMode;
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +47,7 @@ class AgendumApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AgendumTheme.light(fontFamily: fontFamily),
       darkTheme: AgendumTheme.dark(fontFamily: fontFamily),
+      themeMode: themeMode,
       home: AgendumShell(store: store),
     );
   }

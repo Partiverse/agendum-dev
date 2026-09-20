@@ -8,6 +8,7 @@ workspace:
   - packages/db
   - packages/protocol
   - packages/sync
+  - packages/e2ee
   - packages/nlp
   - apps/server
   - apps/demo

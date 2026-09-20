@@ -62,3 +62,30 @@ String appendSortKey(String? last) => midpointSortKey(last, null);
 
 /// 追加到列表开头。
 String prependSortKey(String? first) => midpointSortKey(null, first);
+
+/// 全量均匀重排的 n 个新键（重排压缩，S07 拖拽排序配套）。
+///
+/// 键超长时对整个列表一次性重写：固定宽度 base62 等距分布，
+/// 键 i = ⌊(62^w−1)·(i+1)/(n+1)⌋ 的定宽编码，字典序 = 序。
+/// 宽度 w 取使 62^w > n+1 的最小值（保证首尾项与两端留有间隙）。
+List<String> rebalancedSortKeys(int count) {
+  if (count < 0) throw ArgumentError.value(count, 'count', '须 ≥ 0');
+  if (count == 0) return const [];
+  var space = 1;
+  var w = 0;
+  while (space <= count + 1) {
+    space *= base62Chars.length;
+    w++;
+  }
+  final gap = (space - 1) ~/ (count + 1);
+  return [for (var i = 1; i <= count; i++) _encodeFixedWidth(i * gap, w)];
+}
+
+String _encodeFixedWidth(int v, int width) {
+  final chars = List.filled(width, base62Chars[0]);
+  for (var i = width - 1; i >= 0 && v > 0; i--) {
+    chars[i] = base62Chars[v % base62Chars.length];
+    v ~/= base62Chars.length;
+  }
+  return chars.join();
+}

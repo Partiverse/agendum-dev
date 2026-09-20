@@ -1,3 +1,4 @@
+import 'package:agendum_domain/agendum_domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -84,37 +85,18 @@ class _TaskRowState extends State<TaskRow> {
                                 : scheme.onSurface,
                           ),
                         ),
-                        if (meta.isNotEmpty)
+                        if (meta.isNotEmpty || task.tags.isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.only(top: 3),
-                            child: Row(
+                            child: Wrap(
+                              spacing: 6,
+                              runSpacing: 4,
+                              crossAxisAlignment: WrapCrossAlignment.center,
                               children: [
-                                for (final m in meta) ...[
-                                  Text(
-                                    m,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: scheme.onSurface.withValues(
-                                        alpha: .55,
-                                      ),
-                                    ),
-                                  ),
-                                  if (m != meta.last)
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 6,
-                                      ),
-                                      child: Text(
-                                        '·',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: scheme.onSurface.withValues(
-                                            alpha: .35,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                ],
+                                for (final m in meta) _MetaText(text: m),
+                                if (meta.isNotEmpty && task.tags.isNotEmpty)
+                                  _Dot(scheme: scheme),
+                                for (final tag in task.tags) _TagChip(tag: tag),
                               ],
                             ),
                           ),
@@ -147,6 +129,61 @@ class _TaskRowState extends State<TaskRow> {
       return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;
+  }
+}
+
+class _MetaText extends StatelessWidget {
+  const _MetaText({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Text(
+    text,
+    style: TextStyle(
+      fontSize: 12,
+      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: .55),
+    ),
+  );
+}
+
+class _Dot extends StatelessWidget {
+  const _Dot({required this.scheme});
+
+  final ColorScheme scheme;
+
+  @override
+  Widget build(BuildContext context) => Text(
+    '·',
+    style: TextStyle(
+      fontSize: 12,
+      color: scheme.onSurface.withValues(alpha: .35),
+    ),
+  );
+}
+
+/// 行内标签 chip:自由标签用中性色,互斥组标签用主色调(枚举维度可辨识)。
+class _TagChip extends StatelessWidget {
+  const _TagChip({required this.tag});
+
+  final TagDescriptor tag;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final grouped = tag.groupId != null;
+    final color = grouped ? scheme.primary : scheme.onSurface;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: .1),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        tag.name,
+        style: TextStyle(fontSize: 11, color: color.withValues(alpha: .85)),
+      ),
+    );
   }
 }
 

@@ -70,7 +70,8 @@ void main() {
     await tester.pumpWidget(AgendumApp(store: store));
     await tester.pumpAndSettle();
 
-    final nextTask = store.todayTasks.first; // 种子:'给司机发合同'(next)
+    // rich seed 的今日透视含已完成任务(createdAt 倒序在前),取首个活跃任务。
+    final nextTask = store.todayTasks.firstWhere((t) => !t.isDone);
     await goTab(tester, '今日');
 
     // ⏎ 完成。
@@ -78,13 +79,14 @@ void main() {
         .widget<Focus>(find.byKey(ValueKey('row-focus-${nextTask.id}')))
         .focusNode!
         .requestFocus();
-    await tester.pump();
+    await tester.pump(); // 让 focus 稳定后再发按键事件
     await tester.sendKeyEvent(LogicalKeyboardKey.enter);
     await tester.pumpAndSettle();
     expect(store.byId(nextTask.id).isDone, isTrue);
 
     // ⌫ 入收件箱(done → inbox 回退路径)。
     await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
+    await tester.pump(); // 让 moveToInbox 微任务完成
     await tester.pumpAndSettle();
     expect(store.byId(nextTask.id).status.value, 'inbox');
     expect(
@@ -116,6 +118,38 @@ void main() {
     await tester.pumpAndSettle();
     expect(store.projectList.single.openCount, 1);
     expect(find.text('选瓷砖'), findsOneWidget);
+    await store.close();
+  });
+
+  testWidgets('收件箱拖拽排序:长按拖动写回 sort_key,顺序持久', (tester) async {
+    final store = await newStore();
+    await tester.pumpWidget(AgendumApp(store: store));
+    await tester.pumpAndSettle();
+
+    for (final title in ['甲', '乙', '丙']) {
+      await store.addFromCapture(ParsedCapture(title: title, confidence: 0));
+    }
+    await tester.pumpAndSettle();
+    // 头插语义:新任务在最上 → 丙/乙/甲。
+    expect(store.inboxTasks.map((t) => t.title), ['丙', '乙', '甲']);
+
+    // 长按首行(丙)进入拖拽,向下拖过其余两行。
+    final firstRow = find.byKey(
+      ValueKey('reorder-${store.inboxTasks.first.id}'),
+    );
+    final gesture = await tester.startGesture(tester.getCenter(firstRow));
+    await tester.pump(const Duration(milliseconds: 600));
+    await gesture.moveBy(const Offset(0, 200));
+    await tester.pump();
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    expect(store.inboxTasks.length, 3);
+    expect(
+      store.inboxTasks.first.title,
+      isNot('丙'),
+      reason: '丙 拖离首位后应由 乙 或 甲 占首位',
+    );
     await store.close();
   });
 }

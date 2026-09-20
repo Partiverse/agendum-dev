@@ -15,8 +15,8 @@ void main() {
   setUp(() async {
     db = openInMemoryDb();
     sync = await DriftLocalSyncStore.open(db);
-    repo = ProjectRepository(db, sync);
     tasks = TaskRepository(db, sync);
+    repo = ProjectRepository(db, sync, tasks);
   });
   tearDown(() async => db.close());
 

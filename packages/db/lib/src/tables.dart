@@ -1,8 +1,10 @@
-/// Drift 表定义 —— SQLite DDL v2(03 文档 §2)。
+/// Drift 表定义 —— SQLite DDL v3(03 文档 §2)。
 ///
-/// v2(S06)新增 areas / projects 实体;同步基建三表
+/// v2(S06)新增 areas / projects 实体;v3(S07)新增标签三表
+/// (tag_groups / tags / task_tags)。同步基建三表
 /// (oplog / sync_state / field_lamport)自 v1 全量落地。外键约束不启用:
-/// 跨实体引用以应用层完整性规则维护(S07 落地项目删除→任务回收件箱)。
+/// 跨实体引用以应用层完整性规则维护(任务.project_id 的级联回收、
+/// 标签引用等均在仓库层事务内落定)。
 ///
 /// field_lamport 是 03 文档 §2.4 之外补充的客户端表:pull 应用时按
 /// (lamport, origin, op) 判定远端 op 是否胜出,与服务端 entity_lamport
@@ -87,6 +89,60 @@ class Projects extends Table {
 
   @override
   Set<Column> get primaryKey => {id};
+}
+
+/// tag_groups 表(03 文档 §2.2):标签分组,exclusive=互斥组(同组单选)。
+@DataClassName('TagGroup')
+class TagGroups extends Table {
+  TextColumn get id => text()();
+  TextColumn get name => text()();
+  IntColumn get exclusive => integer().withDefault(const Constant(0))();
+
+  // 公共同步列(03 文档 §2.1)。
+  IntColumn get createdAt => integer()(); // epoch ms
+  IntColumn get updatedAt => integer()();
+  IntColumn get lamport => integer()();
+  TextColumn get origin => text()();
+  IntColumn get deletedAt => integer().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// tags 表(03 文档 §2.2):groupId 为空 = 自由标签。
+@DataClassName('Tag')
+class Tags extends Table {
+  TextColumn get id => text()();
+  TextColumn get groupId => text().nullable()();
+  TextColumn get name => text()();
+
+  // 公共同步列(03 文档 §2.1)。
+  IntColumn get createdAt => integer()(); // epoch ms
+  IntColumn get updatedAt => integer()();
+  IntColumn get lamport => integer()();
+  TextColumn get origin => text()();
+  IntColumn get deletedAt => integer().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// task_tags 表(03 文档 §2.2):任务×标签关联,关联行自身可同步
+/// (oplog entity='task_tag','__row' set/del 即挂/摘标签)。
+@DataClassName('TaskTag')
+class TaskTags extends Table {
+  TextColumn get taskId => text()();
+  TextColumn get tagId => text()();
+
+  // 公共同步列(03 文档 §2.1)。
+  IntColumn get createdAt => integer()(); // epoch ms
+  IntColumn get updatedAt => integer()();
+  IntColumn get lamport => integer()();
+  TextColumn get origin => text()();
+  IntColumn get deletedAt => integer().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {taskId, tagId};
 }
 
 /// oplog:本地待推送/已推送日志(03 文档 §2.4)。

@@ -49,6 +49,28 @@ abstract interface class SyncTransport {
   Future<PullResponse> pull({required int since, required int limit});
 }
 
+/// op 线上编解码钩子(03 文档 §6.2):明文模式恒等;E2EE 密文化由
+/// packages/e2ee 提供实现(XChaCha20-Poly1305,AAD 绑定裁决元数据)。
+/// 引擎只调钩子,不懂密钥 —— 通道语义不变(服务端仍只做序号与转发)。
+abstract interface class OpCodec {
+  /// push 前:本地明文 op → 线上形态。
+  Future<SyncOp> encodeForWire(SyncOp op);
+
+  /// pull 后、本地裁决应用前:线上形态 → 明文 op。
+  Future<SyncOp> decodeFromWire(SyncOp op);
+}
+
+/// 恒等编解码(明文开发模式)。
+class IdentityOpCodec implements OpCodec {
+  const IdentityOpCodec();
+
+  @override
+  Future<SyncOp> encodeForWire(SyncOp op) async => op;
+
+  @override
+  Future<SyncOp> decodeFromWire(SyncOp op) async => op;
+}
+
 class SyncEngine {
   SyncEngine({
     required LocalSyncStore store,
@@ -56,11 +78,14 @@ class SyncEngine {
     this.pullLimit = 2000,
     this.onTrace,
     this.onRemoteApplied,
+    OpCodec? codec,
   }) : _store = store,
-       _transport = transport;
+       _transport = transport,
+       _codec = codec ?? const IdentityOpCodec();
 
   final LocalSyncStore _store;
   final SyncTransport _transport;
+  final OpCodec _codec;
 
   /// 单次 pull 的条数上限(服务端默认 2000,03 文档 §4.2)。
   final int pullLimit;
@@ -82,11 +107,12 @@ class SyncEngine {
       );
       if (batch.isEmpty) return;
       _trace('push ${batch.length} ops');
+      final wireOps = <SyncOp>[];
+      for (final p in batch) {
+        wireOps.add(await _codec.encodeForWire(p.op));
+      }
       final resp = await _transport.push(
-        PushRequest(
-          deviceId: _store.deviceId,
-          ops: [for (final p in batch) p.op],
-        ),
+        PushRequest(deviceId: _store.deviceId, ops: wireOps),
       );
       await _store.markPushed([
         for (final p in batch) p.localSeq,
@@ -101,7 +127,7 @@ class SyncEngine {
     while (true) {
       final resp = await _transport.pull(since: since, limit: pullLimit);
       for (final op in resp.ops) {
-        await _store.applyRemoteOp(op);
+        await _store.applyRemoteOp(await _codec.decodeFromWire(op));
       }
       if (resp.ops.isNotEmpty) onRemoteApplied?.call();
       since = resp.cursor;

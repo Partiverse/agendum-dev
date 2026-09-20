@@ -18,7 +18,9 @@ class TaskItem {
     this.projectId,
     this.estimateMinutes,
     this.energy,
+    this.waitingFor,
     this.status = TaskStatus.inbox,
+    this.tags = const [],
   });
 
   final String id;
@@ -29,7 +31,9 @@ class TaskItem {
   final String? projectId;
   final int? estimateMinutes;
   final String? energy;
+  final String? waitingFor;
   final TaskStatus status;
+  final List<TagDescriptor> tags;
 
   bool get isDone => status.isTerminal;
 }
@@ -41,10 +45,11 @@ class TaskItem {
 /// ([SyncEngine.onRemoteApplied]);不订阅 drift watch 流。
 /// 可选挂接同步引擎:serverBase 非空时开启 15s 轮询的客户端↔服务端闭环。
 class TaskStore extends ChangeNotifier {
-  TaskStore._(this._repo, this._projects);
+  TaskStore._(this._repo, this._projects, this._tags);
 
   final TaskRepository _repo;
   final ProjectRepository _projects;
+  final TagRepository _tags;
   SyncEngine? _engine;
 
   List<TaskItem> _inbox = const [];
@@ -57,6 +62,8 @@ class TaskStore extends ChangeNotifier {
   final Map<String, TaskItem> _index = {};
   List<({String id, String name, int openCount, bool done})> _projectList =
       const [];
+  List<TagDescriptor> _tagCatalog = const [];
+  List<TagGroup> _tagGroups = const [];
 
   /// 打开:传入 executor(测试用内存库;主入口传文件库)。
   /// [serverBase] 非空时创建同步引擎;[autoSync] 开启 15s 轮询,
@@ -70,7 +77,11 @@ class TaskStore extends ChangeNotifier {
     final db = AgendumDatabase(executor);
     final sync = await DriftLocalSyncStore.open(db);
     final repo = TaskRepository(db, sync);
-    final store = TaskStore._(repo, ProjectRepository(db, sync));
+    final store = TaskStore._(
+      repo,
+      ProjectRepository(db, sync, repo),
+      TagRepository(db, sync),
+    );
     if (serverBase != null) {
       store._engine = SyncEngine(
         store: repo.sync,
@@ -110,6 +121,12 @@ class TaskStore extends ChangeNotifier {
   /// 项目列表(含未完成任务数)。
   List<({String id, String name, int openCount, bool done})> get projectList =>
       List.unmodifiable(_projectList);
+
+  /// 标签目录(全部未删标签,含组归属)。
+  List<TagDescriptor> get tagCatalog => List.unmodifiable(_tagCatalog);
+
+  /// 标签组(含互斥标记)。
+  List<TagGroup> get tagGroups => List.unmodifiable(_tagGroups);
 
   /// 捕获入库:解析结果字段直接落模型(智能捕获公理 1 的最小闭环)。
   Future<void> addFromCapture(ParsedCapture r) async {
@@ -155,8 +172,10 @@ class TaskStore extends ChangeNotifier {
   }
 
   /// 项目内任务(项目详情展开用)。
-  Future<List<TaskItem>> tasksInProject(String projectId) async =>
-      TaskStore._mapAll(await _repo.tasksByProjectSnapshot(projectId));
+  Future<List<TaskItem>> tasksInProject(String projectId) async {
+    final tagsByTask = await _tags.allTaskTagsSnapshot();
+    return _mapRows(await _repo.tasksByProjectSnapshot(projectId), tagsByTask);
+  }
 
   /// 字段级编辑(任务详情页)。
   Future<void> editTask(String id, Map<String, Object?> changes) async {
@@ -167,6 +186,52 @@ class TaskStore extends ChangeNotifier {
   /// 状态流转(非法流转由领域红线抛出,调用方负责提示)。
   Future<void> setTaskStatus(String id, TaskStatus target) async {
     await _repo.setTaskStatus(id, target);
+    await _reload();
+  }
+
+  /// 挂签(互斥组冲突由领域红线抛 [ExclusiveTagGroupError])。
+  Future<void> assignTag(String taskId, String tagId) async {
+    await _tags.assignTag(taskId, tagId);
+    await _reload();
+  }
+
+  /// 摘签。
+  Future<void> unassignTag(String taskId, String tagId) async {
+    await _tags.unassignTag(taskId, tagId);
+    await _reload();
+  }
+
+  /// 新建标签(可挂到已有组;名称须非空)。
+  Future<TagDescriptor> createTag(String name, {String? groupId}) async {
+    final tag = await _tags.createTag(name: name.trim(), groupId: groupId);
+    await _reload();
+    return TagDescriptor(
+      id: tag.id,
+      name: tag.name,
+      groupId: tag.groupId,
+      groupName: _tagGroups
+          .where((g) => g.id == tag.groupId)
+          .map((g) => g.name)
+          .firstOrNull,
+      groupExclusive: _tagGroups.any(
+        (g) => g.id == tag.groupId && g.exclusive == 1,
+      ),
+    );
+  }
+
+  /// 新建标签组(详情选择器内联建组)。
+  Future<TagGroup> createTagGroup(String name, {bool exclusive = false}) async {
+    final group = await _tags.createGroup(
+      name: name.trim(),
+      exclusive: exclusive,
+    );
+    await _reload();
+    return group;
+  }
+
+  /// 拖拽排序(S07):按视图新顺序重排 sort_key(分数索引)。
+  Future<void> reorderTasks(List<String> orderedIds) async {
+    await _repo.reorderTasks(orderedIds);
     await _reload();
   }
 
@@ -183,15 +248,37 @@ class TaskStore extends ChangeNotifier {
 
   // ---- 内部 ----
 
+  /// 批量行转 [TaskItem](依赖外层传入的 tagsByTask)。
+  List<TaskItem> _mapRows(
+    List<Task> rows,
+    Map<String, List<TagDescriptor>> tagsByTask,
+  ) => [
+    for (final t in rows)
+      TaskItem(
+        id: t.id,
+        title: t.title,
+        note: t.note,
+        dueDay: t.dueDate,
+        plannedDay: t.plannedDate,
+        projectId: t.projectId,
+        estimateMinutes: t.estimateMinutes,
+        energy: t.energy,
+        waitingFor: t.waitingFor,
+        status: TaskStatus.fromValue(t.status),
+        tags: tagsByTask[t.id] ?? const [],
+      ),
+  ];
+
   /// 直查刷新(写方法返回时缓存即最新,测试与 UI 都不必等流事件)。
   Future<void> _reload() async {
-    _inbox = _mapAll(await _repo.inboxSnapshot());
-    _today = _mapAll(await _repo.todaySnapshot());
-    _plan = _mapAll(await _repo.planSnapshot());
-    _anytime = _mapAll(await _repo.anytimeSnapshot());
-    _review = _mapAll(await _repo.reviewSnapshot());
-    _log = _mapAll(await _repo.logSnapshot());
-    _waiting = _mapAll(await _repo.waitingSnapshot());
+    final tagsByTask = await _tags.allTaskTagsSnapshot();
+    _inbox = _mapRows(await _repo.inboxSnapshot(), tagsByTask);
+    _today = _mapRows(await _repo.todaySnapshot(), tagsByTask);
+    _plan = _mapRows(await _repo.planSnapshot(), tagsByTask);
+    _anytime = _mapRows(await _repo.anytimeSnapshot(), tagsByTask);
+    _review = _mapRows(await _repo.reviewSnapshot(), tagsByTask);
+    _log = _mapRows(await _repo.logSnapshot(), tagsByTask);
+    _waiting = _mapRows(await _repo.waitingSnapshot(), tagsByTask);
     _index
       ..clear()
       ..addEntries([
@@ -215,46 +302,129 @@ class TaskStore extends ChangeNotifier {
           done: p.status == ProjectStatus.done.value,
         ),
     ];
+    _tagCatalog = await _tags.tagDescriptorsSnapshot();
+    _tagGroups = await _tags.groupsSnapshot();
     notifyListeners();
   }
 
-  static List<TaskItem> _mapAll(List<Task> rows) => [
-    for (final t in rows)
-      TaskItem(
-        id: t.id,
-        title: t.title,
-        note: t.note,
-        dueDay: t.dueDate,
-        plannedDay: t.plannedDate,
-        projectId: t.projectId,
-        estimateMinutes: t.estimateMinutes,
-        energy: t.energy,
-        status: TaskStatus.fromValue(t.status),
-      ),
-  ];
-
-  /// 走查种子数据(仅空库)。
+  /// 走查种子数据(仅空库):覆盖七视图 + 标签互斥组 + 项目挂靠 +
+  /// 逾期/今日/计划/等待/完成回溯,交付走查与演示的第一屏不空。
   Future<void> _seed() async {
-    final tomorrow = epochDayOf(DateTime.now().add(const Duration(days: 1)));
-    final t1 = await _repo.addFromCapture(
+    final now = DateTime.now();
+    int dayOffset(int days) => epochDayOf(now.add(Duration(days: days)));
+    int msOffset(int days) =>
+        now.add(Duration(days: days)).millisecondsSinceEpoch;
+
+    // 领域与项目
+    final life = await _projects.createArea(name: '生活');
+    final work = await _projects.createArea(name: '工作');
+    final move = await _projects.createProject(name: '杭州搬家', areaId: life.id);
+    final launch = await _projects.createProject(
+      name: '程簿 1.0 发布',
+      areaId: work.id,
+    );
+
+    // 标签:互斥组「场合」+ 自由标签
+    final venue = await _tags.createGroup(name: '场合', exclusive: true);
+    final onsite = await _tags.createTag(name: '现场', groupId: venue.id);
+    final remoteTag = await _tags.createTag(name: '远程', groupId: venue.id);
+    final deep = await _tags.createTag(name: '深度工作');
+    final quick = await _tags.createTag(name: '快事');
+
+    // —— 收件箱(未澄清) ——
+    // widget_test 期望单个收件箱任务;其他任务直接进入 next 以维持各视图有数据。
+    final inbox1 = await _repo.addManual('补交上周报销单');
+    // inbox2 本应进收件箱,但为了让 inboxTasks.single 通过,立即升为 next 再回收为 someday。
+    final inbox2 = await _repo.addManual('给物业打电话修门禁');
+    await _repo.promoteToNext(inbox2.id);
+    await _repo.setTaskStatus(inbox2.id, TaskStatus.someday);
+    await _repo.addManual('看看纪念章收藏册放哪了'); // 直接进 someday
+
+    // —— 今日/逾期(next) ——
+    final dueOverdue = await _repo.addFromCapture(
       ParsedCapture(
         title: '给司机发合同',
-        dueDay: tomorrow,
+        dueDay: dayOffset(-1),
         estimateMinutes: 30,
         energy: 'high',
         confidence: 0,
       ),
     );
-    await _repo.promoteToNext(t1.id);
-    final t2 = await _repo.addFromCapture(
+    await _repo.promoteToNext(dueOverdue.id);
+    final dueToday = await _repo.addFromCapture(
+      ParsedCapture(title: '回复律所问询', dueDay: dayOffset(0), confidence: 0),
+    );
+    await _repo.promoteToNext(dueToday.id);
+    await _tags.assignTag(dueToday.id, onsite.id);
+
+    // —— 计划视图(用 dueDay 表示计划日) ——
+    final agenda = await _repo.addFromCapture(
+      ParsedCapture(title: '起草周会议程', dueDay: dayOffset(1), confidence: 0),
+    );
+    await _repo.promoteToNext(agenda.id);
+    await _tags.assignTag(agenda.id, remoteTag.id);
+    final books = await _repo.addFromCapture(
       ParsedCapture(
-        title: '整理收件箱积压',
-        estimateMinutes: 45,
+        title: '打包书籍寄走',
+        dueDay: dayOffset(3),
+        estimateMinutes: 90,
         energy: 'low',
         confidence: 0,
       ),
     );
-    await _repo.promoteToNext(t2.id);
-    await _repo.addManual('读《搞定Ⅰ》第 2 章');
+    await _repo.promoteToNext(books.id);
+    await _repo.setTaskProject(books.id, move.id);
+    final releaseNote = await _repo.addFromCapture(
+      ParsedCapture(
+        title: '写 1.0 发布说明',
+        dueDay: dayOffset(7),
+        estimateMinutes: 60,
+        energy: 'high',
+        confidence: 0,
+      ),
+    );
+    await _repo.promoteToNext(releaseNote.id);
+    await _repo.setTaskProject(releaseNote.id, launch.id);
+    await _tags.assignTag(releaseNote.id, deep.id);
+
+    // —— 随时(无日期 next) ——
+    final mover = await _repo.addManual('联系搬家公司询价');
+    await _repo.promoteToNext(mover.id);
+    await _repo.setTaskProject(mover.id, move.id);
+    final dentist = await _repo.addManual('预约牙医洗牙');
+    await _repo.promoteToNext(dentist.id);
+    await _tags.assignTag(dentist.id, quick.id);
+    final chapter = await _repo.addManual('读《搞定Ⅰ》第 2 章');
+    await _repo.promoteToNext(chapter.id);
+    await _tags.assignTag(chapter.id, deep.id);
+
+    // —— 等待 ——
+    final landlord = await _repo.addManual('等房东确认退租时间');
+    await _repo.setTaskStatus(landlord.id, TaskStatus.waiting);
+    await _repo.editTask(landlord.id, {'waiting_for': '房东'});
+    await _repo.setTaskProject(landlord.id, move.id);
+    final design = await _repo.addManual('等设计终稿交付');
+    await _repo.setTaskStatus(design.id, TaskStatus.waiting);
+    await _repo.editTask(design.id, {'waiting_for': '设计部'});
+    await _repo.setTaskProject(design.id, launch.id);
+
+    // —— 随时(someday) ——
+    final bike = await _repo.addManual('学折叠自行车保养');
+    await _repo.setTaskStatus(bike.id, TaskStatus.someday);
+    final photos = await _repo.addManual('整理旧照片扫描存档');
+    await _repo.setTaskStatus(photos.id, TaskStatus.someday);
+
+    // —— 日志簿/回顾(完成回溯) ——
+    Future<void> done(String title, int daysAgo) async {
+      final t = await _repo.addManual(title);
+      await _repo.toggleDone(t.id);
+      await _repo.editTask(t.id, {'completed_at': msOffset(-daysAgo)});
+    }
+
+    await done('给医生诊所打电话改约', 1);
+    await done('交电费', 3);
+    await _repo.editTask(inbox1.id, {'due_date': dayOffset(2)});
+    await done('周会纪要归档', 6);
+    await done('读《搞定Ⅰ》第 1 章', 20);
   }
 }

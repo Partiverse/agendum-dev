@@ -4,6 +4,7 @@ library;
 import 'package:agendum_client/main.dart';
 import 'package:agendum_client/views/store.dart';
 import 'package:agendum_client/views/task_detail.dart';
+import 'package:agendum_domain/agendum_domain.dart';
 import 'package:agendum_nlp/agendum_nlp.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
@@ -54,17 +55,20 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('高').last);
     await tester.pumpAndSettle();
-    expect(store.inboxTasks.single.energy, 'high');
+    expect(store.inboxTasks.first.energy, 'high');
 
     await tester.tap(find.text('无').last);
     await tester.pumpAndSettle();
-    expect(store.inboxTasks.single.energy, isNull);
+    expect(store.inboxTasks.first.energy, isNull);
     await store.close();
   });
 
   testWidgets('状态 chips 走领域状态机;非法流转弹 SnackBar', (tester) async {
     final store = await pumpApp(tester, seed: true);
-    final task = store.inboxTasks.single;
+    // rich seed 的收件箱透视混有已完成任务(Things 行为),建纯任务避开。
+    await store.addManual('纯净状态测试');
+    final task = store.inboxTasks.firstWhere((t) => t.title == '纯净状态测试');
+    await tester.pumpAndSettle();
 
     await tester.tap(find.text(task.title));
     await tester.pumpAndSettle();
@@ -91,7 +95,7 @@ void main() {
     final store = await pumpApp(tester);
     await store.addProject('装修');
     await store.addFromCapture(ParsedCapture(title: '选瓷砖', confidence: 0));
-    final task = store.inboxTasks.single;
+    final task = store.inboxTasks.first;
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('选瓷砖'));
@@ -102,6 +106,80 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(store.byId(task.id).projectId, store.projectList.single.id);
+    await store.close();
+  });
+
+  testWidgets('标签:挂自由标签 → 行内 chip 出现;再点 ✕ 摘除', (tester) async {
+    final store = await pumpApp(tester);
+    await store.addFromCapture(ParsedCapture(title: '写周报', confidence: 0));
+    await store.createTag('深度工作');
+    await tester.pumpAndSettle();
+
+    final task = store.inboxTasks.single;
+    await tester.tap(find.text('写周报'));
+    await tester.pumpAndSettle();
+
+    // 候选标签 chip → 挂上。
+    await tester.tap(find.text('深度工作').last);
+    await tester.pumpAndSettle();
+    expect(store.byId(task.id).tags.map((t) => t.name), contains('深度工作'));
+
+    // 关掉 sheet,行内 chip 可见(进收件箱后)。
+    Navigator.of(tester.element(find.byType(TaskDetailSheet))).pop();
+    await tester.pumpAndSettle();
+    expect(find.text('深度工作'), findsOneWidget);
+    await store.close();
+  });
+
+  testWidgets('标签:互斥组冲突置灰,直调 store 抛 ExclusiveTagGroupError', (tester) async {
+    final store = await pumpApp(tester);
+    await store.addFromCapture(ParsedCapture(title: '开评审会', confidence: 0));
+    final group = await store.createTagGroup('场合', exclusive: true);
+    final onsite = await store.createTag('现场', groupId: group.id);
+    final remote = await store.createTag('远程', groupId: group.id);
+    await tester.pumpAndSettle();
+
+    final task = store.inboxTasks.single;
+    await store.assignTag(task.id, onsite.id);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('开评审会'));
+    await tester.pumpAndSettle();
+
+    // 同组「远程」候选被置灰:ActionChip.onPressed == null。
+    final remoteChip = tester.widget<ActionChip>(
+      find
+          .ancestor(of: find.text('远程'), matching: find.byType(ActionChip))
+          .first,
+    );
+    expect(remoteChip.onPressed, isNull, reason: '互斥同组候选应置灰');
+
+    // 绕过 UI 直调 store:领域红线抛出。
+    await expectLater(
+      store.assignTag(task.id, remote.id),
+      throwsA(isA<ExclusiveTagGroupError>()),
+    );
+    expect(store.byId(task.id).tags.map((t) => t.name), ['现场']);
+    await store.close();
+  });
+
+  testWidgets('标签:详情页内联新建并自动挂上', (tester) async {
+    final store = await pumpApp(tester);
+    await store.addFromCapture(ParsedCapture(title: '整理书桌', confidence: 0));
+    await tester.pumpAndSettle();
+
+    final task = store.inboxTasks.single;
+    await tester.tap(find.text('整理书桌'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('新建'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const ValueKey('new-tag-field')), '快事');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+
+    expect(store.byId(task.id).tags.map((t) => t.name), contains('快事'));
+    expect(store.tagCatalog.map((t) => t.name), contains('快事'));
     await store.close();
   });
 }

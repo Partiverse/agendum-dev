@@ -6,5 +6,6 @@ export 'src/local_sync_store.dart';
 export 'src/project_fields.dart';
 export 'src/project_repository.dart';
 export 'src/tables.dart';
+export 'src/tag_repository.dart';
 export 'src/task_fields.dart';
 export 'src/task_repository.dart';

@@ -1,7 +1,7 @@
 /// 交付走查 golden 渲染(加载系统苹方,真实渲染中文)。
-/// 运行:`flutter test --update-goldens test/golden_screens_test.dart`
+/// 运行:`flutter test --update-goldens --no-skip test/golden_screens_test.dart`
 /// 产物:`test/goldens/*.png`(人工走查用;CI 默认跳过,防跨平台渲染差异误报)。
-@Skip('golden 走查产物,仅在 --update-goldens 显式运行时生成/比对')
+@Skip('golden 走查产物,仅在 --update-goldens --no-skip 显式运行时生成/比对')
 library;
 
 import 'dart:io';
@@ -10,7 +10,6 @@ import 'dart:async';
 import 'package:agendum_client/main.dart';
 import 'package:agendum_client/views/store.dart';
 import 'package:agendum_client/views/task_detail.dart';
-import 'package:agendum_nlp/agendum_nlp.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -47,7 +46,7 @@ Future<void> _loadSystemFonts() async {
 void main() {
   setUpAll(_loadSystemFonts);
 
-  Future<TaskStore> pump(WidgetTester tester) async {
+  Future<TaskStore> pump(WidgetTester tester, {bool dark = false}) async {
     final store = await TaskStore.open(
       executor: NativeDatabase.memory(),
       seedIfEmpty: true,
@@ -55,7 +54,13 @@ void main() {
     tester.view.devicePixelRatio = 2;
     tester.view.physicalSize = const Size(1440, 1040);
     addTearDown(tester.view.reset);
-    await tester.pumpWidget(AgendumApp(store: store, fontFamily: 'PingFang'));
+    await tester.pumpWidget(
+      AgendumApp(
+        store: store,
+        fontFamily: 'PingFang',
+        themeMode: dark ? ThemeMode.dark : ThemeMode.light,
+      ),
+    );
     await tester.pumpAndSettle();
     return store;
   }
@@ -67,12 +72,8 @@ void main() {
     );
   }
 
-  testWidgets('收件箱:捕获条 + 种子任务', (tester) async {
+  testWidgets('收件箱:捕获条 + 走查数据集', (tester) async {
     final store = await pump(tester);
-    await store.addFromCapture(
-      ParsedCapture(title: '给医生诊所打电话改约', confidence: 0),
-    );
-    await tester.pumpAndSettle();
     await render(tester, '01-inbox');
     await store.close();
   });
@@ -85,9 +86,13 @@ void main() {
     await store.close();
   });
 
-  testWidgets('任务详情页', (tester) async {
+  testWidgets('任务详情页:含标签区', (tester) async {
     final store = await pump(tester);
-    final task = store.inboxTasks.first;
+    // 选一个带标签的种子任务,让标签区在走查里可见。
+    final task = store.inboxTasks.firstWhere(
+      (t) => t.tags.isNotEmpty,
+      orElse: () => store.inboxTasks.first,
+    );
     final context = tester.element(find.byType(Scaffold).first);
     unawaited(showTaskDetail(context, store, task.id));
     await tester.pumpAndSettle();
@@ -97,13 +102,9 @@ void main() {
 
   testWidgets('项目视图:含项目与展开任务', (tester) async {
     final store = await pump(tester);
-    await store.addProject('程簿 1.0 发布');
-    final t = store.inboxTasks.first;
-    await store.setTaskProject(t.id, store.projectList.single.id);
-    await tester.pumpAndSettle();
     await tester.tap(find.text('项目').first);
     await tester.pumpAndSettle();
-    await tester.tap(find.text('程簿 1.0 发布'));
+    await tester.tap(find.text('杭州搬家').first);
     await tester.pumpAndSettle();
     await render(tester, '04-projects');
     await store.close();
@@ -114,6 +115,59 @@ void main() {
     await tester.tap(find.text('计划').first);
     await tester.pumpAndSettle();
     await render(tester, '05-plan');
+    await store.close();
+  });
+
+  testWidgets('随时视图:拖拽排序面', (tester) async {
+    final store = await pump(tester);
+    await tester.tap(find.text('随时').first);
+    await tester.pumpAndSettle();
+    await render(tester, '06-anytime');
+    await store.close();
+  });
+
+  testWidgets('回顾视图:近 7 天完成', (tester) async {
+    final store = await pump(tester);
+    await tester.tap(find.text('回顾').first);
+    await tester.pumpAndSettle();
+    await render(tester, '07-review');
+    await store.close();
+  });
+
+  testWidgets('日志簿:全部完成', (tester) async {
+    final store = await pump(tester);
+    await tester.tap(find.text('日志').first);
+    await tester.pumpAndSettle();
+    await render(tester, '08-log');
+    await store.close();
+  });
+
+  // ---- 暗色走查(05 文档 W7–8 暗色验收) ----
+
+  testWidgets('暗色:收件箱', (tester) async {
+    final store = await pump(tester, dark: true);
+    await render(tester, 'dark-01-inbox');
+    await store.close();
+  });
+
+  testWidgets('暗色:今日', (tester) async {
+    final store = await pump(tester, dark: true);
+    await tester.tap(find.text('今日').first);
+    await tester.pumpAndSettle();
+    await render(tester, 'dark-02-today');
+    await store.close();
+  });
+
+  testWidgets('暗色:任务详情页', (tester) async {
+    final store = await pump(tester, dark: true);
+    final task = store.inboxTasks.firstWhere(
+      (t) => t.tags.isNotEmpty,
+      orElse: () => store.inboxTasks.first,
+    );
+    final context = tester.element(find.byType(Scaffold).first);
+    unawaited(showTaskDetail(context, store, task.id));
+    await tester.pumpAndSettle();
+    await render(tester, 'dark-03-task-detail');
     await store.close();
   });
 }

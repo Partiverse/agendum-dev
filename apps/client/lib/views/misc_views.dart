@@ -4,6 +4,7 @@ import 'store.dart';
 import 'task_row.dart';
 
 /// 七视图骨架(S06)的通用任务列表页:大标题 + 空状态 + 任务行卡片。
+/// [reorderable] 为真时长按任务行可拖拽排序(分数索引写回 sort_key)。
 class TaskListPane extends StatelessWidget {
   const TaskListPane({
     super.key,
@@ -12,6 +13,7 @@ class TaskListPane extends StatelessWidget {
     required this.tasks,
     required this.emptyText,
     this.subtitle,
+    this.reorderable = false,
   });
 
   final TaskStore store;
@@ -19,6 +21,7 @@ class TaskListPane extends StatelessWidget {
   final List<TaskItem> tasks;
   final String emptyText;
   final String? subtitle;
+  final bool reorderable;
 
   @override
   Widget build(BuildContext context) {
@@ -63,14 +66,41 @@ class TaskListPane extends StatelessWidget {
         else
           Card(
             clipBehavior: Clip.antiAlias,
-            child: Column(
-              children: [
-                for (final t in tasks) ...[
-                  TaskRow(task: t, store: store),
-                  if (t != tasks.last) const Divider(indent: 52),
-                ],
-              ],
-            ),
+            child: reorderable
+                ? ReorderableListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    buildDefaultDragHandles: false,
+                    itemCount: tasks.length,
+                    onReorderItem: (oldIndex, newIndex) {
+                      final next = [...tasks];
+                      final moved = next.removeAt(oldIndex);
+                      next.insert(newIndex, moved);
+                      store.reorderTasks([for (final t in next) t.id]);
+                    },
+                    itemBuilder: (context, i) {
+                      final t = tasks[i];
+                      return Column(
+                        key: ValueKey('reorder-${t.id}'),
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ReorderableDelayedDragStartListener(
+                            index: i,
+                            child: TaskRow(task: t, store: store),
+                          ),
+                          if (i != tasks.length - 1) const Divider(indent: 52),
+                        ],
+                      );
+                    },
+                  )
+                : Column(
+                    children: [
+                      for (final t in tasks) ...[
+                        TaskRow(task: t, store: store),
+                        if (t != tasks.last) const Divider(indent: 52),
+                      ],
+                    ],
+                  ),
           ),
       ],
     );
@@ -107,6 +137,7 @@ class AnytimeView extends StatelessWidget {
       title: '随时',
       tasks: store.anytimeTasks,
       emptyText: '随时可做的事都清空了',
+      reorderable: true,
     );
   }
 }

@@ -27,10 +27,11 @@ class TaskRepository {
   DriftLocalSyncStore get sync => _sync;
 
   /// 捕获入库(智能捕获公理 1 的最小闭环):解析结果字段直接落模型。
+  /// sort_key 头插(分数索引):新任务在最上,拖拽重排后仍稳定。
   Future<Task> addFromCapture(ParsedCapture r) => _db.transaction(() async {
     final lamport = await _sync.tick();
     final now = DateTime.now().millisecondsSinceEpoch;
-    final key = appendSortKey(await _lastSortKey());
+    final key = prependSortKey(await _firstSortKey());
     final id = const Uuid().v7();
     final rowJson = <String, Object?>{
       'title': r.title,
@@ -132,8 +133,99 @@ class TaskRepository {
 
   Future<Task> byId(String id) => _byId(id);
 
+  /// 项目删除的关系完整性(S07):项目内任务回收件箱。
+  /// project_id 一律置空;活跃任务(收件箱/下一步/随时)经状态机回 inbox;
+  /// waiting 保持(等谁与项目无关)、done 保持完成、trashed 不动。
+  /// 在调用方(项目删除)的事务内调用 —— drift 嵌套事务并入外层。
+  Future<int> recycleTasksFromProject(String projectId) =>
+      _db.transaction(() async {
+        final rows =
+            await (_db.select(_db.tasks)..where(
+                  (t) => t.deletedAt.isNull() & t.projectId.equals(projectId),
+                ))
+                .get();
+        for (final row in rows) {
+          final status = TaskStatus.fromValue(row.status);
+          if (status == TaskStatus.trashed) continue;
+          final backToInbox = switch (status) {
+            TaskStatus.inbox || TaskStatus.next || TaskStatus.someday => true,
+            _ => false,
+          };
+          await _edit(row, {
+            'project_id': null,
+            if (backToInbox) 'status': TaskStatus.inbox.value,
+          });
+        }
+        return rows.length;
+      });
+
+  /// 手动排序(S07 拖拽,分数索引):按视图给出的新顺序重排 sort_key。
+  /// 单一移动只在原邻居间取新中点(一次拖拽 = 1 条 op);
+  /// 中点越界(键超长)或多处变动(远端穿插等)时整表均匀重排压缩。
+  Future<void> reorderTasks(List<String> orderedIds) =>
+      _db.transaction(() async {
+        if (orderedIds.length < 2) return;
+        final rows = await (_db.select(
+          _db.tasks,
+        )..where((t) => t.id.isIn(orderedIds))).get();
+        final byId = {for (final r in rows) r.id: r};
+        // 视图顺序里可能混入已被并发删除的行,按现存行截断。
+        final ids = [
+          for (final id in orderedIds)
+            if (byId.containsKey(id)) id,
+        ];
+        if (ids.length < 2) return;
+        final oldOrder = [...ids]
+          ..sort((a, b) => byId[a]!.sortKey.compareTo(byId[b]!.sortKey));
+        if (_listEquals(oldOrder, ids)) return; // 无变化
+        final moved = _singleMovedItem(oldOrder, ids);
+        if (moved != null) {
+          final i = ids.indexOf(moved);
+          final prev = i > 0 ? byId[ids[i - 1]]!.sortKey : null;
+          final next = i + 1 < ids.length ? byId[ids[i + 1]]!.sortKey : null;
+          try {
+            final key = midpointSortKey(prev, next);
+            if (key.length <= maxSortKeyLength) {
+              await _edit(byId[moved]!, {'sort_key': key});
+              return;
+            }
+          } on ArgumentError {
+            // prev ≥ next(远端穿插等罕见态):整表重排兜底
+          } on StateError {
+            // 键超长:整表重排压缩
+          }
+        }
+        final keys = rebalancedSortKeys(ids.length);
+        for (var i = 0; i < ids.length; i++) {
+          if (byId[ids[i]]!.sortKey != keys[i]) {
+            await _edit(byId[ids[i]]!, {'sort_key': keys[i]});
+          }
+        }
+      });
+
+  /// 单项移动识别(严格版):去掉候选项后两序完全一致才算。
+  /// 这保证新邻居在原序中相邻 —— 中点键必不与现存键碰撞。
+  /// 任意整表重排(远端穿插等)识别失败,走均匀重排压缩兜底。
+  String? _singleMovedItem(List<String> oldOrder, List<String> newOrder) {
+    if (oldOrder.length != newOrder.length) return null;
+    for (var i = 0; i < oldOrder.length; i++) {
+      if (oldOrder[i] != newOrder[i]) {
+        final candidates = {oldOrder[i], newOrder[i]};
+        for (final candidate in candidates) {
+          final ro = [...oldOrder]..remove(candidate);
+          final rn = [...newOrder]..remove(candidate);
+          if (_listEquals(ro, rn)) return candidate;
+        }
+        return null;
+      }
+    }
+    return null;
+  }
+
   /// 收件箱透视快照:未澄清 + 已完成(Things 行为:完成保留显示删除线)。
   /// trashed 不显示(墓碑由 deleted_at 另行标记)。
+  /// 排序 = sort_key(分数索引,创建头插):支持 S07 拖拽手动排序,
+  /// 未拖拽时视觉顺序与创建时间倒序一致。
   /// 用一次性查询而非 watch 流:视图缓存由调用方在明确刷新点重查
   /// (本地写后 / 引擎 onRemoteApplied 后);drift watch 依赖真实事件循环,
   /// 在 widget 测试的 FakeAsync zone 不可达,且刷新点收敛后也无必要。
@@ -162,6 +254,7 @@ class TaskRepository {
           .get();
 
   /// 随时透视:someday + 无日期的 next(S06 简化语义)。
+  /// 排序 = sort_key:随时列表是手动排序的主视图(S07 拖拽)。
   Future<List<Task>> anytimeSnapshot() =>
       (_db.select(_db.tasks)
             ..where(
@@ -173,7 +266,7 @@ class TaskRepository {
                       t.status.equals(TaskStatus.next.value)),
             )
             ..orderBy([
-              (t) => OrderingTerm.desc(t.createdAt),
+              (t) => OrderingTerm.asc(t.sortKey),
               (t) => OrderingTerm.desc(t.id),
             ]))
           .get();
@@ -238,7 +331,7 @@ class TaskRepository {
             t.status.isIn([TaskStatus.inbox.value, TaskStatus.done.value]),
       )
       ..orderBy([
-        (t) => OrderingTerm.desc(t.createdAt),
+        (t) => OrderingTerm.asc(t.sortKey),
         (t) => OrderingTerm.desc(t.id),
       ]);
     return q;
@@ -336,13 +429,24 @@ class TaskRepository {
   Future<Task> _byId(String id) =>
       (_db.select(_db.tasks)..where((t) => t.id.equals(id))).getSingle();
 
-  Future<String?> _lastSortKey() async {
+  Future<String?> _firstSortKey() async {
     final row =
         await (_db.select(_db.tasks)
-              ..orderBy([(t) => OrderingTerm.desc(t.sortKey)])
+              ..orderBy([
+                (t) => OrderingTerm.asc(t.sortKey),
+                (t) => OrderingTerm.desc(t.id),
+              ])
               ..limit(1))
             .getSingleOrNull();
     return row?.sortKey;
+  }
+
+  bool _listEquals(List<String> a, List<String> b) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
   }
 
   Future<void> _appendOp({

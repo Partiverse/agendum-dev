@@ -1,4 +1,5 @@
-/// 本地数据库入口(迁移策略随 schema 版本演进:v1 tasks+同步基建,v2 +areas/projects)。
+/// 本地数据库入口(迁移策略随 schema 版本演进:v1 tasks+同步基建,
+/// v2 +areas/projects,v3 +标签三表)。
 library;
 
 import 'dart:io';
@@ -10,12 +11,24 @@ import 'tables.dart';
 
 part 'database.g.dart';
 
-@DriftDatabase(tables: [Tasks, Areas, Projects, Oplog, SyncState, FieldLamport])
+@DriftDatabase(
+  tables: [
+    Tasks,
+    Areas,
+    Projects,
+    TagGroups,
+    Tags,
+    TaskTags,
+    Oplog,
+    SyncState,
+    FieldLamport,
+  ],
+)
 class AgendumDatabase extends _$AgendumDatabase {
   AgendumDatabase(super.e);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -23,6 +36,11 @@ class AgendumDatabase extends _$AgendumDatabase {
       if (from < 2) {
         await m.createTable(areas);
         await m.createTable(projects);
+      }
+      if (from < 3) {
+        await m.createTable(tagGroups);
+        await m.createTable(tags);
+        await m.createTable(taskTags);
       }
     },
   );
