@@ -3,8 +3,10 @@ import 'package:flutter/services.dart';
 
 import '../utils.dart';
 import 'store.dart';
+import 'task_detail.dart';
 
 /// Things 风格任务行：圆形勾选 + 标题 + 元信息行（日期/时长/精力）。
+/// 交互(S07)：点勾选完成/恢复;点行打开任务详情。
 /// 键盘流 v1(S06)：行聚焦后 ⏎ 完成/恢复、⌫ 回收进收件箱。
 class TaskRow extends StatefulWidget {
   const TaskRow({super.key, required this.task, required this.store});
@@ -44,7 +46,7 @@ class _TaskRowState extends State<TaskRow> {
         builder: (context) {
           final focused = Focus.of(context).hasFocus;
           return InkWell(
-            onTap: () => widget.store.toggleDone(task.id),
+            onTap: () => showTaskDetail(context, widget.store, task.id),
             child: Container(
               decoration: BoxDecoration(
                 color: focused
@@ -54,7 +56,15 @@ class _TaskRowState extends State<TaskRow> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
                 children: [
-                  _CircleCheckbox(done: task.isDone),
+                  GestureDetector(
+                    key: ValueKey('check-${task.id}'),
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => widget.store.toggleDone(task.id),
+                    child: Padding(
+                      padding: const EdgeInsets.all(2),
+                      child: _CircleCheckbox(done: task.isDone),
+                    ),
+                  ),
                   const SizedBox(width: 14),
                   Expanded(
                     child: Column(

@@ -37,19 +37,19 @@ void main() {
     await store.close();
   });
 
-  testWidgets('点击任务行完成 → 删除线；再点恢复（领域状态机）', (tester) async {
+  testWidgets('点勾选完成 → 删除线；再点恢复（领域状态机）', (tester) async {
     final store = await newStore(seed: true);
     await tester.pumpWidget(app(store));
     await tester.pumpAndSettle();
 
     final t = store.inboxTasks.single; // '读《搞定Ⅰ》第 2 章'
     expect(t.isDone, isFalse);
-    await tester.tap(find.text(t.title));
+    await tester.tap(find.byKey(ValueKey('check-${t.id}')));
     await tester.pumpAndSettle();
     expect(store.byId(t.id).isDone, isTrue);
     expect(find.text(t.title), findsOneWidget); // 完成后保留在收件箱(删除线)
 
-    await tester.tap(find.text(t.title));
+    await tester.tap(find.byKey(ValueKey('check-${t.id}')));
     await tester.pumpAndSettle();
     expect(store.byId(t.id).isDone, isFalse, reason: 'done → next 回退路径');
     await store.close();

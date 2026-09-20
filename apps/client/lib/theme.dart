@@ -14,11 +14,14 @@ abstract final class AgendumTokens {
 }
 
 abstract final class AgendumTheme {
-  static ThemeData light() => _base(Brightness.light);
+  /// [fontFamily] 供 golden 走查注入系统 CJK 字体(生产走平台默认)。
+  static ThemeData light({String? fontFamily}) =>
+      _base(Brightness.light, fontFamily);
 
-  static ThemeData dark() => _base(Brightness.dark);
+  static ThemeData dark({String? fontFamily}) =>
+      _base(Brightness.dark, fontFamily);
 
-  static ThemeData _base(Brightness brightness) {
+  static ThemeData _base(Brightness brightness, String? fontFamily) {
     final scheme = ColorScheme.fromSeed(
       seedColor: AgendumTokens.seed,
       brightness: brightness,
@@ -29,6 +32,7 @@ abstract final class AgendumTheme {
     final dark = brightness == Brightness.dark;
     return ThemeData(
       colorScheme: scheme,
+      fontFamily: fontFamily,
       useMaterial3: true,
       scaffoldBackgroundColor: scheme.surface,
       splashFactory: InkSparkle.splashFactory,

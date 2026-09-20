@@ -14,6 +14,8 @@ class TaskItem {
     required this.title,
     this.note,
     this.dueDay,
+    this.plannedDay,
+    this.projectId,
     this.estimateMinutes,
     this.energy,
     this.status = TaskStatus.inbox,
@@ -23,6 +25,8 @@ class TaskItem {
   final String title;
   final String? note;
   final int? dueDay;
+  final int? plannedDay;
+  final String? projectId;
   final int? estimateMinutes;
   final String? energy;
   final TaskStatus status;
@@ -49,6 +53,8 @@ class TaskStore extends ChangeNotifier {
   List<TaskItem> _anytime = const [];
   List<TaskItem> _review = const [];
   List<TaskItem> _log = const [];
+  List<TaskItem> _waiting = const [];
+  final Map<String, TaskItem> _index = {};
   List<({String id, String name, int openCount, bool done})> _projectList =
       const [];
 
@@ -114,17 +120,8 @@ class TaskStore extends ChangeNotifier {
   Future<void> addManual(String title) =>
       addFromCapture(ParsedCapture(title: title, confidence: 0));
 
-  TaskItem byId(String id) =>
-      _inbox.firstWhere((t) => t.id == id, orElse: () => _anyTask(id));
-
-  TaskItem _anyTask(String id) {
-    for (final list in [_today, _plan, _anytime, _review, _log]) {
-      for (final t in list) {
-        if (t.id == id) return t;
-      }
-    }
-    throw StateError('任务不在任何视图缓存中:$id');
-  }
+  /// 按 id 取任务(合并索引,waiting 等未上视图的任务也可查)。
+  TaskItem byId(String id) => _index[id] ?? (throw StateError('任务不在索引中:$id'));
 
   /// 完成/恢复(领域状态机)。
   Future<void> toggleDone(String id) async {
@@ -161,6 +158,18 @@ class TaskStore extends ChangeNotifier {
   Future<List<TaskItem>> tasksInProject(String projectId) async =>
       TaskStore._mapAll(await _repo.tasksByProjectSnapshot(projectId));
 
+  /// 字段级编辑(任务详情页)。
+  Future<void> editTask(String id, Map<String, Object?> changes) async {
+    await _repo.editTask(id, changes);
+    await _reload();
+  }
+
+  /// 状态流转(非法流转由领域红线抛出,调用方负责提示)。
+  Future<void> setTaskStatus(String id, TaskStatus target) async {
+    await _repo.setTaskStatus(id, target);
+    await _reload();
+  }
+
   /// 手动触发一轮同步(push + pull)。
   Future<void> syncNow() async {
     await _engine?.syncNow();
@@ -182,6 +191,21 @@ class TaskStore extends ChangeNotifier {
     _anytime = _mapAll(await _repo.anytimeSnapshot());
     _review = _mapAll(await _repo.reviewSnapshot());
     _log = _mapAll(await _repo.logSnapshot());
+    _waiting = _mapAll(await _repo.waitingSnapshot());
+    _index
+      ..clear()
+      ..addEntries([
+        for (final list in [
+          _inbox,
+          _today,
+          _plan,
+          _anytime,
+          _review,
+          _log,
+          _waiting,
+        ])
+          for (final item in list) MapEntry(item.id, item),
+      ]);
     _projectList = [
       for (final (p, count) in await _projects.projectListSnapshot())
         (
@@ -201,6 +225,8 @@ class TaskStore extends ChangeNotifier {
         title: t.title,
         note: t.note,
         dueDay: t.dueDate,
+        plannedDay: t.plannedDate,
+        projectId: t.projectId,
         estimateMinutes: t.estimateMinutes,
         energy: t.energy,
         status: TaskStatus.fromValue(t.status),

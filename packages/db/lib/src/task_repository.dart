@@ -110,6 +110,26 @@ class TaskRepository {
         await _edit(row, {'project_id': projectId});
       });
 
+  /// 字段级编辑(任务详情页用;字段名必须是 tasks 白名单列)。
+  Future<void> editTask(String id, Map<String, Object?> changes) =>
+      _db.transaction(() async {
+        final row = await _byId(id);
+        await _edit(row, changes);
+      });
+
+  /// 状态流转(详情页状态 chips;done 记 completed_at,离开 done 清除)。
+  Future<void> setTaskStatus(String id, TaskStatus target) =>
+      _db.transaction(() async {
+        final row = await _byId(id);
+        transition(TaskStatus.fromValue(row.status), target);
+        await _edit(row, {
+          'status': target.value,
+          'completed_at': target == TaskStatus.done
+              ? DateTime.now().millisecondsSinceEpoch
+              : null,
+        });
+      });
+
   Future<Task> byId(String id) => _byId(id);
 
   /// 收件箱透视快照:未澄清 + 已完成(Things 行为:完成保留显示删除线)。
@@ -173,6 +193,20 @@ class TaskRepository {
           ..orderBy([(t) => OrderingTerm.desc(t.completedAt)]))
         .get();
   }
+
+  /// 等待中透视(waiting;等待视图 S08 落地,先供详情页索引)。
+  Future<List<Task>> waitingSnapshot() =>
+      (_db.select(_db.tasks)
+            ..where(
+              (t) =>
+                  t.deletedAt.isNull() &
+                  t.status.equals(TaskStatus.waiting.value),
+            )
+            ..orderBy([
+              (t) => OrderingTerm.desc(t.createdAt),
+              (t) => OrderingTerm.desc(t.id),
+            ]))
+          .get();
 
   /// 日志簿:全部已完成,按完成时间倒序。
   Future<List<Task>> logSnapshot() =>
