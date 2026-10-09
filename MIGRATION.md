@@ -10,7 +10,7 @@
 
 | 项 | 值 |
 | --- | --- |
-| 分支 / 工作区 | `main`，工作区 clean，无 tag，**无 git 远端（历史仅存在本机——最高风险项）** |
+| 分支 / 工作区 | `main`，工作区 clean，无 tag；远端 **`https://github.com/Partiverse/agendum-dev`**（private，2026-09-21 已推送 `d623717`） |
 | 最后代码提交 | `9455bb8`（S07：标签系统 + 拖拽排序 + E2EE 层 + 设计走查 #1），其时 `make ci` 全绿 |
 | 本文档所在提交 | 交接锚点提交（`fba0eda` 为其父，docs-only，不涉代码） |
 | 测试基线 | 全仓 110+ 例测试全绿；黄金评估集约 300 例，CI 门槛 `--min 0.75` |
@@ -23,9 +23,10 @@ CI 即 `ubuntu-latest`（`.github/workflows/pr-ci.yml`，Flutter 3.47.4），**�
 
 ### 必带
 
-1. **git 历史**（仓库无远端，这是唯一权威副本）：
-   - 已生成离线包：`/Users/nebulaboratories/ai-dev-codebase/agendum-migration-20260921.bundle`（约 6 MB，`git bundle verify` 可校验）。
-   - 或整体 rsync 工作区（排除 `build/`、`.dart_tool/`、`.DS_Store`，见"不带"清单）。
+1. **git 历史**（已推 GitHub，bundle 转为离线备份）：
+   - 远端：`https://github.com/Partiverse/agendum-dev`（private，Kubuntu 侧 `git clone` 此地址即可）。
+   - 离线备份：`/Users/nebulaboratories/ai-dev-codebase/agendum-migration-20260921.bundle`（1.9 MB，含完整历史，`git clone <bundle> -b main` 可用）。
+   - 注：mac 全局 gitconfig 有 `url.https://gh-proxy.com/…insteadOf` 重写（国内直连加速）；**Linux 默认没有**，直连 github.com，如需镜像自行加同样的全局重写。
 2. **持久记忆目录**（不随 git 走）：
    `/Users/nebulaboratories/.zcode/cli/memories/projects/agendum-dev-64c18836016433f5/memory/`
    （2 个文件：`MEMORY.md` 索引 + `agendum-macos-build-quirks.md` + 本迁移新增的 `migration-handoff-macos-to-linux.md`）。重挂方法见 §5。
@@ -45,10 +46,10 @@ CI 即 `ubuntu-latest`（`.github/workflows/pr-ci.yml`，Flutter 3.47.4），**�
 ## 2. Linux 侧重建步骤（按序执行）
 
 1. 工具链：Flutter 3.47.x stable + Dart 3.10.6（Linux x64/aarch64 官方均有；CI 锁 3.47.4）；Docker（`make up` 起 Postgres，宿主机 5433）；GNU make。`mise.toml` 备而未用（brew 仅为 mac 方案）。
-2. 取代码：`git clone /path/to/agendum-migration-20260921.bundle -b main agendum-dev`（bundle 即 remote），或 rsync 整目录。
+2. 取代码（二选一）：`gh repo clone Partiverse/agendum-dev`（先 `gh auth login`，HTTPS 协议，token 需 repo+workflow scope）；或 `git clone https://github.com/Partiverse/agendum-dev.git`；无网环境用 bundle（§1）。
 3. `flutter pub get`（pub workspaces 一次解析全部成员；`pubspec.lock` 已入库保证可复现）。
 4. **`make ci`**（fmt-check → analyze → test → eval → flutter-check）——迁移后第一件事，全绿才算迁移成功。
-5. **立即建远端**：`gh repo create <private> && git remote add origin … && git push -u origin main`，消除单副本风险。
+5. ~~建远端~~ **mac 侧已完成**：仓库为 Partiverse/agendum-dev（private）。Linux 只需 `gh auth login` 后正常 fetch/push。
 6. 服务端冒烟：`PORT=8090 dart run apps/server/bin/server.dart`（无 `DATABASE_URL` 时用内存存储）；`curl 'localhost:8090/v1/sync/pull?since=0'`。
 7. 客户端：`apps/client` 目前只含 macos/ios 平台目录。Linux 上 `flutter test` 不受影响；要桌面运行需 `flutter config --enable-linux-desktop && flutter create --platforms=linux .`（生成的 `linux/` 是否入库需另行决定；macos/Runner 已入库，不受影响）。
 8. 记忆重挂（§5）。
@@ -103,7 +104,7 @@ CI 即 `ubuntu-latest`（`.github/workflows/pr-ci.yml`，Flutter 3.47.4），**�
 
 | 项 | 影响 |
 | --- | --- |
-| 无 git 远端 | 迁移完成前历史只有 bundle 一份副本——**Linux 侧第 5 步（建远端 push）不可跳过** |
+| ~~无 git 远端~~ 已解决 | 2026-09-21 mac 侧已建 private 远端并推送；bundle 留作离线备份 |
 | 实机走查/截图管线 | ScreenCaptureKit 方案不可迁移；Linux 上走 widget test / 手动核对 |
 | KPI 数字口径 | 现有性能数字均为 Apple Silicon 实测，Linux 不可直接对比，验收需重测口径 |
 | Apple 平台能力 | DataDetectors/Foundation Models 桥（ADR-006）、EventKit、全局捕获条均为 Apple 侧；Linux 开发期以规则引擎/平台抽象推进 |
