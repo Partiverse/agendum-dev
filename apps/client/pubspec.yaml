@@ -11,7 +11,11 @@ dependencies:
     ^0.0.1
   agendum_domain:
     ^0.0.1
+  agendum_e2ee:
+    ^0.0.1
   agendum_nlp:
+    ^0.0.1
+  agendum_protocol:
     ^0.0.1
   agendum_sync:
     ^0.0.1
@@ -20,6 +24,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_secure_storage: ^11.2.0
+  http: ^1.2.0
   path_provider: ^2.1.0
   sqlite3_flutter_libs: ^0.5.24
 

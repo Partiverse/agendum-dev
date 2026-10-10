@@ -218,6 +218,29 @@ void main() {
       );
       expect(await fingerprintOf(keys.publicKey), keys.fingerprint);
     });
+
+    test('verifyB64:wire 形态(base64 公钥+签名)验签(R1 §3/§4 服务端镜像)', () async {
+      final keys = await DeviceKeys.generate();
+      final message = utf8.encode('agendum/auth:dvc_1:bm9uY2U=');
+      final sigB64 = base64Encode((await keys.sign(message)).bytes);
+      expect(
+        await DeviceKeys.verifyB64(
+          message: message,
+          sigB64: sigB64,
+          publicKeyB64: keys.publicKeyB64,
+        ),
+        isTrue,
+      );
+      // 原文被篡改 → 验不过(401 语义的客户端侧自检)。
+      expect(
+        await DeviceKeys.verifyB64(
+          message: utf8.encode('agendum/auth:dvc_2:bm9uY2U='),
+          sigB64: sigB64,
+          publicKeyB64: keys.publicKeyB64,
+        ),
+        isFalse,
+      );
+    });
   });
 
   group('E2eeOpCodec', () {

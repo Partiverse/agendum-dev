@@ -9,6 +9,9 @@ class FakeStore implements LocalSyncStore {
   @override
   String deviceId = 'dvc_test';
 
+  @override
+  String uid = 'uid_test';
+
   final pending = <PendingOp>[];
   final applied = <SyncOp>[];
   int? lastPushedSeq;
@@ -66,6 +69,7 @@ class FakeStore implements LocalSyncStore {
 class FakeTransport implements SyncTransport {
   final pushes = <PushRequest>[];
   final pullSinces = <int>[];
+  final pullUids = <String>[];
   PushResponse Function(PushRequest req)? onPush;
   PullResponse Function(int since, int limit)? onPull;
 
@@ -83,8 +87,13 @@ class FakeTransport implements SyncTransport {
   }
 
   @override
-  Future<PullResponse> pull({required int since, required int limit}) async {
+  Future<PullResponse> pull({
+    required int since,
+    required int limit,
+    required String uid,
+  }) async {
     pullSinces.add(since);
+    pullUids.add(uid);
     return onPull?.call(since, limit) ??
         PullResponse(cursor: since, ops: const [], hasMore: false);
   }
@@ -112,6 +121,7 @@ void main() {
 
     expect(transport.pushes, hasLength(1));
     expect(transport.pushes.single.deviceId, 'dvc_test');
+    expect(transport.pushes.single.uid, 'uid_test', reason: 'R1 §5:push 带 uid');
     expect(transport.pushes.single.ops.map((o) => o.entityId), ['e1', 'e2']);
     expect(store.lastPushedSeq, 1);
     expect(store.pending, isEmpty);
@@ -154,6 +164,10 @@ void main() {
     await engine.pull();
 
     expect(transport.pullSinces, [0, 100], reason: '按 cursor 增量续传');
+    expect(transport.pullUids, [
+      'uid_test',
+      'uid_test',
+    ], reason: 'R1 §5:pull 带 uid');
     expect(store.applied.map((o) => o.entityId), ['e1', 'e2', 'e3']);
     expect(store.cursor, 200);
   });

@@ -5,6 +5,7 @@ import 'package:agendum_client/main.dart';
 import 'package:agendum_client/views/store.dart';
 import 'package:agendum_client/views/task_detail.dart';
 import 'package:agendum_domain/agendum_domain.dart';
+import 'package:agendum_e2ee/agendum_e2ee.dart';
 import 'package:agendum_nlp/agendum_nlp.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ void main() {
   Future<TaskStore> pumpApp(WidgetTester tester, {bool seed = false}) async {
     final store = await TaskStore.open(
       executor: NativeDatabase.memory(),
+      keyStore: InMemoryKeyStore(), // 测试走内存 KeyStore(R1 §7)
       seedIfEmpty: seed,
     );
     await tester.pumpWidget(AgendumApp(store: store));

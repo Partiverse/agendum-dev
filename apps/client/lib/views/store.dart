@@ -2,10 +2,14 @@ import 'dart:async';
 
 import 'package:agendum_db/agendum_db.dart';
 import 'package:agendum_domain/agendum_domain.dart';
+import 'package:agendum_e2ee/agendum_e2ee.dart';
 import 'package:agendum_nlp/agendum_nlp.dart';
 import 'package:agendum_sync/agendum_sync.dart';
 import 'package:drift/drift.dart' show QueryExecutor;
 import 'package:flutter/foundation.dart';
+
+import '../device_auth.dart';
+import '../identity.dart';
 
 /// 一条任务在本地视图模型(S05 起由 Drift 行映射,只读;变更走 [TaskStore])。
 class TaskItem {
@@ -45,11 +49,12 @@ class TaskItem {
 /// ([SyncEngine.onRemoteApplied]);不订阅 drift watch 流。
 /// 可选挂接同步引擎:serverBase 非空时开启 15s 轮询的客户端↔服务端闭环。
 class TaskStore extends ChangeNotifier {
-  TaskStore._(this._repo, this._projects, this._tags);
+  TaskStore._(this._repo, this._projects, this._tags, this._vault);
 
   final TaskRepository _repo;
   final ProjectRepository _projects;
   final TagRepository _tags;
+  final IdentityVault _vault;
   SyncEngine? _engine;
 
   List<TaskItem> _inbox = const [];
@@ -65,27 +70,59 @@ class TaskStore extends ChangeNotifier {
   List<TagDescriptor> _tagCatalog = const [];
   List<TagGroup> _tagGroups = const [];
 
-  /// 打开:传入 executor(测试用内存库;主入口传文件库)。
-  /// [serverBase] 非空时创建同步引擎;[autoSync] 开启 15s 轮询,
-  /// 关闭则仅手动 [syncNow](测试确定性用)。
+  /// 打开(首次为库生成设备 ID 并初始化 sync_state 行)。
+  ///
+  /// R1 §7 默认 E2EE:KeyStore 已有恢复短语 → 恢复同一 Vault;无 → 生成
+  /// BIP39 12 词经 KeyStore 持久化,并以 E2eeOpCodec 建 SyncEngine。
+  /// [keyStore] 生产传 SecureStorageKeyStore,测试传 InMemoryKeyStore。
+  /// [plaintext] 明文开发模式,经 [resolvePlaintextMode] 门禁:仅构建期
+  /// `-DAGENDUM_PLAINTEXT=true` 放行(uid 固定 'dev-plain',恒等编解码)。
+  /// [recoveryPhrase] 显式恢复短语(第二设备接入/测试固定种子),优先于
+  /// KeyStore 已存值并回写。 [deviceAuth] 挂设备鉴权头(R1 §4/§9,挑战 +
+  /// Ed25519 签名);对无挑战端点的旧服务端显式传 false。
   static Future<TaskStore> open({
     required QueryExecutor executor,
+    required KeyStore keyStore,
     bool seedIfEmpty = false,
     String? serverBase,
     bool autoSync = true,
+    bool? plaintext,
+    String? recoveryPhrase,
+    bool deviceAuth = true,
   }) async {
+    final vault = await IdentityVault.load(
+      keyStore: keyStore,
+      plaintext: resolvePlaintextMode(requested: plaintext),
+      recoveryPhrase: recoveryPhrase,
+    );
     final db = AgendumDatabase(executor);
-    final sync = await DriftLocalSyncStore.open(db);
+    final sync = await DriftLocalSyncStore.open(db, uid: vault.uid);
     final repo = TaskRepository(db, sync);
     final store = TaskStore._(
       repo,
       ProjectRepository(db, sync, repo),
       TagRepository(db, sync),
+      vault,
     );
     if (serverBase != null) {
+      Future<Map<String, String>> Function()? authHeaders;
+      if (deviceAuth) {
+        final device = await DeviceIdentity.load(keyStore: keyStore);
+        authHeaders = DeviceAuthService(
+          base: serverBase,
+          deviceId: sync.deviceId,
+          keys: device.keys,
+          uid: vault.uid,
+          uidProofB64: vault.uidProofB64, // 注册准入:uid 归属证明(ADR-016 §6)
+        ).authHeaders; // 懒注册:首个签名请求前完成注册(R1 §3/§4)
+      }
       store._engine = SyncEngine(
         store: repo.sync,
-        transport: RestSyncTransport(base: serverBase),
+        transport: RestSyncTransport(
+          base: serverBase,
+          authHeaders: authHeaders,
+        ),
+        codec: vault.codec,
         onTrace: debugPrint,
         onRemoteApplied: () {
           unawaited(store._reload());
@@ -99,6 +136,20 @@ class TaskStore extends ChangeNotifier {
     if (autoSync) store._engine?.startPolling();
     return store;
   }
+
+  /// 租户 uid(R1 §1):Vault 主密钥派生;明文模式固定 'dev-plain'。
+  String get uid => _vault.uid;
+
+  /// 注册归属证明(ADR-016 §6,base64;明文模式为 null):
+  /// 测试/上层组 DeviceAuthService 时透传,正常 UI 路径不触碰。
+  String? get uidProofB64 => _vault.uidProofB64;
+
+  /// 恢复短语(只读,供未来 onboarding UI;明文模式为 null)。
+  /// 不打印、不落日志 —— 唯一出口是 UI 展示给本机用户。
+  String? get recoveryPhrase => _vault.mnemonic;
+
+  /// 是否明文开发模式(恒等编解码)。
+  bool get isPlaintextMode => _vault.isPlaintext;
 
   /// 收件箱:未澄清的 + 已完成的(完成后保留显示删除线,Things 行为)。
   List<TaskItem> get inboxTasks => List.unmodifiable(_inbox);

@@ -8,22 +8,36 @@ import 'op.dart';
 const String protocolVersion = 'v1';
 
 class PushRequest {
-  const PushRequest({required this.deviceId, required this.ops});
+  const PushRequest({
+    required this.uid,
+    required this.deviceId,
+    required this.ops,
+  });
 
   /// 单批上限（03 文档 §4.2：≤500 条/批）。
   static const int maxBatchSize = 500;
+
+  /// 租户标识（R1 §5）：客户端从 Vault 主密钥派生（HKDF，info='agendum/uid'，
+  /// 16 字节十六进制小写）；明文开发模式固定 'dev-plain'。服务端按 owner=uid
+  /// 隔离 oplog，并与鉴权设备注册时的 uid 比对，不一致 401。
+  final String uid;
 
   final String deviceId;
   final List<SyncOp> ops;
 
   Map<String, Object?> toJson() => {
     'device_id': deviceId,
+    'uid': uid,
     'ops': ops.map((o) => o.toJson()).toList(),
   };
 
   factory PushRequest.fromJson(Map<String, Object?> json) {
+    final uid = json['uid'];
     final deviceId = json['device_id'];
     final rawOps = json['ops'];
+    if (uid is! String || uid.isEmpty) {
+      throw const FormatException('push.uid 缺失');
+    }
     if (deviceId is! String || deviceId.isEmpty) {
       throw const FormatException('push.device_id 缺失');
     }
@@ -32,6 +46,7 @@ class PushRequest {
       throw FormatException('push.ops 超过单批上限 $maxBatchSize');
     }
     return PushRequest(
+      uid: uid,
       deviceId: deviceId,
       ops: [for (final o in rawOps) SyncOp.fromJson(o as Map<String, Object?>)],
     );

@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:agendum_client/main.dart';
 import 'package:agendum_client/views/store.dart';
 import 'package:agendum_db/agendum_db.dart';
+import 'package:agendum_e2ee/agendum_e2ee.dart';
 import 'package:agendum_nlp/agendum_nlp.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
@@ -15,8 +16,12 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   Widget app(TaskStore store) => AgendumApp(store: store); // 主题跟随测试平台亮度
 
-  Future<TaskStore> newStore({bool seed = false}) =>
-      TaskStore.open(executor: NativeDatabase.memory(), seedIfEmpty: seed);
+  Future<TaskStore> newStore({bool seed = false}) => TaskStore.open(
+    executor: NativeDatabase.memory(),
+    // 测试走内存 KeyStore,不触平台通道(R1 §7)。
+    keyStore: InMemoryKeyStore(),
+    seedIfEmpty: seed,
+  );
 
   testWidgets('捕获条输入自然语言 → 解析预览 → 回车入收件箱', (tester) async {
     final store = await newStore();
@@ -92,14 +97,21 @@ void main() {
     final tmp = await Directory.systemTemp.createTemp('agendum_test');
     addTearDown(() => tmp.delete(recursive: true));
     final path = '${tmp.path}${Platform.pathSeparator}t.sqlite';
+    final keyStore = InMemoryKeyStore(); // 同设备:重启后仍是同一 KeyStore
 
-    final s1 = await TaskStore.open(executor: openNativeFileExecutor(path));
+    final s1 = await TaskStore.open(
+      executor: openNativeFileExecutor(path),
+      keyStore: keyStore,
+    );
     await s1.addFromCapture(
       const ParsedCapture(title: '买牛奶', estimateMinutes: 15, confidence: 1),
     );
     await s1.close();
 
-    final s2 = await TaskStore.open(executor: openNativeFileExecutor(path));
+    final s2 = await TaskStore.open(
+      executor: openNativeFileExecutor(path),
+      keyStore: keyStore,
+    );
     expect(s2.inboxTasks.single.title, '买牛奶');
     expect(s2.inboxTasks.single.estimateMinutes, 15);
     await s2.close();

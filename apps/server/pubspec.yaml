@@ -12,6 +12,8 @@ dependencies:
   agendum_protocol:
     ^0.0.1
   crypto: ^3.0.0
+  # Ed25519 注册/鉴权验签（与 packages/e2ee 同一实现，服务端只持公钥）。
+  cryptography: ^2.7.0
   meta: ^1.15.0
   postgres: ^3.1.0
   shelf: ^1.4.1

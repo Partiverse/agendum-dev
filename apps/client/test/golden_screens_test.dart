@@ -10,6 +10,7 @@ import 'dart:async';
 import 'package:agendum_client/main.dart';
 import 'package:agendum_client/views/store.dart';
 import 'package:agendum_client/views/task_detail.dart';
+import 'package:agendum_e2ee/agendum_e2ee.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -49,6 +50,7 @@ void main() {
   Future<TaskStore> pump(WidgetTester tester, {bool dark = false}) async {
     final store = await TaskStore.open(
       executor: NativeDatabase.memory(),
+      keyStore: InMemoryKeyStore(), // 测试走内存 KeyStore(R1 §7)
       seedIfEmpty: true,
     );
     tester.view.devicePixelRatio = 2;

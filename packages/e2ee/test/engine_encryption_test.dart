@@ -14,6 +14,9 @@ class FakeStore implements LocalSyncStore {
   @override
   String deviceId = 'dvc_enc';
 
+  @override
+  String uid = 'uid_enc';
+
   final pending = <PendingOp>[];
   final applied = <SyncOp>[];
   int cursor = 0;
@@ -76,7 +79,11 @@ class RelayTransport implements SyncTransport {
   }
 
   @override
-  Future<PullResponse> pull({required int since, required int limit}) async {
+  Future<PullResponse> pull({
+    required int since,
+    required int limit,
+    required String uid,
+  }) async {
     final ops = inbox.skip(since).take(limit).toList();
     return PullResponse(
       cursor: since + ops.length,

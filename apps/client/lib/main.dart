@@ -2,6 +2,7 @@ import 'package:agendum_db/agendum_db.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'secure_key_store.dart';
 import 'theme.dart';
 import 'views/agendum_shell.dart';
 import 'views/store.dart';
@@ -17,6 +18,8 @@ Future<void> main() async {
   final support = await getApplicationSupportDirectory();
   final store = await TaskStore.open(
     executor: openNativeFileExecutor('${support.path}/agendum.sqlite3'),
+    // 生产密钥存储:Keychain/libsecret;MK 不落 SQLite(R1 §2/§7)。
+    keyStore: SecureStorageKeyStore(),
     // 演示种子只进 demo/测试(显式传 true);生产首启必须是干净的用户库。
     seedIfEmpty: false,
     serverBase: _serverBase,

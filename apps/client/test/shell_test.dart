@@ -3,6 +3,7 @@ library;
 
 import 'package:agendum_client/main.dart';
 import 'package:agendum_client/views/store.dart';
+import 'package:agendum_e2ee/agendum_e2ee.dart';
 import 'package:agendum_nlp/agendum_nlp.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
@@ -10,8 +11,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  Future<TaskStore> newStore({bool seed = false}) =>
-      TaskStore.open(executor: NativeDatabase.memory(), seedIfEmpty: seed);
+  Future<TaskStore> newStore({bool seed = false}) => TaskStore.open(
+    executor: NativeDatabase.memory(),
+    keyStore: InMemoryKeyStore(), // 测试走内存 KeyStore(R1 §7)
+    seedIfEmpty: seed,
+  );
 
   // 七个目的地的 rail 标签按序切换(宽屏测试面 800x600 出 NavigationRail)。
   Future<void> goTab(WidgetTester tester, String label) async {

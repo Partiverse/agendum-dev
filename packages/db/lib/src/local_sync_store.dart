@@ -15,7 +15,13 @@ import 'project_fields.dart';
 import 'task_fields.dart';
 
 class DriftLocalSyncStore implements LocalSyncStore {
-  DriftLocalSyncStore._(this._db, this.deviceId, this._clock, this._cursor);
+  DriftLocalSyncStore._(
+    this._db,
+    this.deviceId,
+    this._clock,
+    this._cursor,
+    this.uid,
+  );
 
   final AgendumDatabase _db;
   final LamportClock _clock;
@@ -23,10 +29,21 @@ class DriftLocalSyncStore implements LocalSyncStore {
   @override
   final String deviceId;
 
+  /// 租户 uid(R1 §8):push 请求体与 pull 查询参数透传,服务端按
+  /// owner=uid 过滤。owner 由服务端从请求推导,本地 oplog 表结构不动;
+  /// 缺省即明文开发模式的固定租户(agendum_e2ee 的 devPlaintextUid,
+  /// 此处用字面量避免 db → e2ee 依赖)。
+  @override
+  final String uid;
+
   int _cursor;
 
   /// 打开(首次为库生成设备 ID 并初始化 sync_state 行)。
-  static Future<DriftLocalSyncStore> open(AgendumDatabase db) async {
+  /// [uid] 由上层从 Vault 主密钥派生后注入(R1 §8)。
+  static Future<DriftLocalSyncStore> open(
+    AgendumDatabase db, {
+    String uid = 'dev-plain',
+  }) async {
     final existing = await (db.select(
       db.syncState,
     )..limit(1)).getSingleOrNull();
@@ -36,13 +53,14 @@ class DriftLocalSyncStore implements LocalSyncStore {
         existing.deviceId,
         LamportClock(value: existing.lamport),
         existing.lastPullSeq,
+        uid,
       );
     }
     final deviceId = 'dvc_${const Uuid().v7()}';
     await db
         .into(db.syncState)
         .insert(SyncStateCompanion.insert(deviceId: deviceId, lamport: 0));
-    return DriftLocalSyncStore._(db, deviceId, LamportClock(), 0);
+    return DriftLocalSyncStore._(db, deviceId, LamportClock(), 0, uid);
   }
 
   int get lamport => _clock.value;

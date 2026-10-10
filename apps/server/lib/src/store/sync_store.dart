@@ -10,10 +10,16 @@ import 'package:agendum_protocol/agendum_protocol.dart';
 abstract interface class SyncStore {
   /// 分配全局单调 server_seq，维护 (entity, entity_id, field) 裁决表。
   /// accepted = 本次写入在裁决表上胜出（幂等重放同源同 op 亦视为 accepted）。
+  /// owner 取自 [PushRequest.uid]（R1 §5 租户隔离）。
   Future<PushResponse> push(PushRequest req);
 
-  /// 返回 seq > since 的 op（至多 limit 条），cursor 为最后返回条目的 seq。
-  Future<PullResponse> pull({required int since, required int limit});
+  /// 返回 owner=uid 且 seq > since 的 op（至多 limit 条），cursor 为最后
+  /// 返回条目的 seq（R1 §5：跨 uid 的 pull 拿不到对方任何 op）。
+  Future<PullResponse> pull({
+    required int since,
+    required int limit,
+    required String owner,
+  });
 
   Future<void> close();
 }

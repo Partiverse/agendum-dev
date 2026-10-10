@@ -59,6 +59,23 @@ class DeviceKeys {
     required Signature signature,
   }) => _ed25519.verify(message, signature: signature);
 
+  /// wire 验签（R1 §3/§4）：base64 公钥 + base64 签名 + 原文，一次调用。
+  /// 服务端注册/鉴权校验与客户端测试共用，免去各处手工组 Signature。
+  static Future<bool> verifyB64({
+    required List<int> message,
+    required String sigB64,
+    required String publicKeyB64,
+  }) => verify(
+    message: message,
+    signature: Signature(
+      base64Decode(sigB64),
+      publicKey: SimplePublicKey(
+        base64Decode(publicKeyB64),
+        type: KeyPairType.ed25519,
+      ),
+    ),
+  );
+
   /// 指纹格式自检（防手滑改坏格式）。
   static bool looksLikeFingerprint(String s) =>
       RegExp(r'^[0-9A-F]{4}(-[0-9A-F]{4}){7}$').hasMatch(s);

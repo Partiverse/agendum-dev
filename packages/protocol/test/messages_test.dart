@@ -14,9 +14,16 @@ SyncOp op(int lamport, {SyncOpType type = SyncOpType.set}) => SyncOp(
 void main() {
   group('PushRequest/Response', () {
     test('往返', () {
-      final req = PushRequest(deviceId: 'd1', ops: [op(1), op(2)]);
-      final back = PushRequest.fromJson(req.toJson());
+      final req = PushRequest(
+        deviceId: 'd1',
+        uid: 'dev-plain',
+        ops: [op(1), op(2)],
+      );
+      final json = req.toJson();
+      expect(json.keys.toSet(), {'device_id', 'uid', 'ops'}); // R1 §5 新增 uid
+      final back = PushRequest.fromJson(json);
       expect(back.deviceId, 'd1');
+      expect(back.uid, 'dev-plain');
       expect(back.ops.length, 2);
 
       final resp = PushResponse(
@@ -35,10 +42,26 @@ void main() {
       expect(
         () => PushRequest.fromJson({
           'device_id': 'd1',
+          'uid': 'dev-plain',
           'ops': List.generate(
             PushRequest.maxBatchSize + 1,
             (i) => op(i).toJson(),
           ),
+        }),
+        throwsFormatException,
+      );
+    });
+
+    test('缺 uid 拒绝(R1 §5 租户隔离为强制字段)', () {
+      expect(
+        () => PushRequest.fromJson({'device_id': 'd1', 'ops': <Object?>[]}),
+        throwsFormatException,
+      );
+      expect(
+        () => PushRequest.fromJson({
+          'device_id': 'd1',
+          'uid': '',
+          'ops': <Object?>[],
         }),
         throwsFormatException,
       );

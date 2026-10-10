@@ -22,6 +22,11 @@ abstract interface class LocalSyncStore {
   /// 本设备 ID(push 与 op.device_id 必须一致)。
   String get deviceId;
 
+  /// 租户 uid(R1 §5/§8):push 请求体与 pull 查询参数都携带,服务端
+  /// 按 owner=uid 过滤。由上层(Vault 主密钥派生/明文模式固定值)注入,
+  /// 本包不理解其内部结构。
+  String get uid;
+
   /// 取未确认(server_seq 为空)的 ops,按 local_seq 升序。
   Future<List<PendingOp>> takePendingOps({int limit});
 
@@ -46,7 +51,13 @@ abstract interface class LocalSyncStore {
 abstract interface class SyncTransport {
   Future<PushResponse> push(PushRequest req);
 
-  Future<PullResponse> pull({required int since, required int limit});
+  /// [uid] 为租户标识(R1 §5):服务端按 owner=uid 过滤,跨 uid 拿不到
+  /// 对方任何 op。
+  Future<PullResponse> pull({
+    required int since,
+    required int limit,
+    required String uid,
+  });
 }
 
 /// op 线上编解码钩子(03 文档 §6.2):明文模式恒等;E2EE 密文化由
@@ -118,7 +129,7 @@ class SyncEngine {
         wireOps.add(await _codec.encodeForWire(p.op));
       }
       final resp = await _transport.push(
-        PushRequest(deviceId: _store.deviceId, ops: wireOps),
+        PushRequest(deviceId: _store.deviceId, uid: _store.uid, ops: wireOps),
       );
       await _store.markPushed([
         for (final p in batch) p.localSeq,
@@ -136,7 +147,11 @@ class SyncEngine {
   Future<void> pull() async {
     var since = await _store.pullCursor();
     while (true) {
-      final resp = await _transport.pull(since: since, limit: pullLimit);
+      final resp = await _transport.pull(
+        since: since,
+        limit: pullLimit,
+        uid: _store.uid,
+      );
       var applied = 0;
       for (final wireOp in resp.ops) {
         final op = await _codec.decodeFromWire(wireOp);

@@ -1,11 +1,15 @@
-/// Postgres 实现（03 文档 §4.4 表结构）。
+/// Postgres 实现（03 文档 §4.4 表结构；R1 §5 owner 租户隔离）。
 ///
 /// - `sync_ops`：全局 BIGSERIAL 序号的追加日志，payload 为 op JSON
-///   （明文 PoC 模式；E2EE 时改 BYTEA 密文，S08 落地）。
+///   （明文 PoC 模式；E2EE 时改 BYTEA 密文，S08 落地），owner = 请求 uid。
 /// - `entity_lamport`：字段裁决表，用 ON CONFLICT ... WHERE 的原子
-///   行比较实现"高 (lamport, origin) 胜出"，多实例安全。
+///   行比较实现"高 (lamport, origin) 胜出"，多实例安全；owner 列随写
+///   更新（主键仍为 (entity, entity_id, field)——见 ADR-016 取舍）。
+/// - `pull` 一律 `WHERE owner = @o`：跨 uid 拿不到对方任何 op。
 ///
-/// 表结构由本类幂等创建（PoC 便捷）；正式迁移走 dbmate（S05）。
+/// 表结构由本类幂等创建（PoC 便捷）；既有库经
+/// `ALTER TABLE ... ADD COLUMN IF NOT EXISTS owner` 兼容（旧行填 ''），
+/// 正式迁移走 dbmate（S05）。
 library;
 
 import 'dart:convert';
@@ -47,6 +51,7 @@ final class PgSyncStore implements SyncStore {
     await c.execute('''
       CREATE TABLE IF NOT EXISTS sync_ops (
         seq BIGSERIAL PRIMARY KEY,
+        owner TEXT NOT NULL,
         device_id TEXT NOT NULL,
         lamport BIGINT NOT NULL,
         entity TEXT NOT NULL,
@@ -57,6 +62,11 @@ final class PgSyncStore implements SyncStore {
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
     ''');
+    // R1 §5：既有库补 owner 列（旧行填 ''，仅历史数据，新写入都带 uid）。
+    await c.execute(
+      'ALTER TABLE sync_ops ADD COLUMN IF NOT EXISTS owner TEXT NOT NULL '
+      "DEFAULT ''",
+    );
     await c.execute('''
       CREATE TABLE IF NOT EXISTS entity_lamport (
         entity TEXT NOT NULL,
@@ -67,6 +77,10 @@ final class PgSyncStore implements SyncStore {
         PRIMARY KEY (entity, entity_id, field)
       )
     ''');
+    await c.execute(
+      'ALTER TABLE entity_lamport ADD COLUMN IF NOT EXISTS owner TEXT NOT NULL '
+      "DEFAULT ''",
+    );
   }
 
   @override
@@ -85,31 +99,36 @@ final class PgSyncStore implements SyncStore {
       for (final op in req.ops) {
         final ins = await session.execute(
           Sql.named(
-            'INSERT INTO sync_ops (device_id, lamport, entity, entity_id, field, op, payload) '
-            'VALUES (@d, @l, @e, @eid, @f, @o, @p:jsonb) RETURNING seq',
+            'INSERT INTO sync_ops (owner, device_id, lamport, entity, '
+            'entity_id, field, op, payload) '
+            'VALUES (@o, @d, @l, @e, @eid, @f, @op, @p:jsonb) RETURNING seq',
           ),
           parameters: {
+            'o': req.uid,
             'd': op.deviceId,
             'l': op.lamport,
             'e': op.entity,
             'eid': op.entityId,
             'f': op.field,
-            'o': syncOpTypeToJson(op.type),
+            'op': syncOpTypeToJson(op.type),
             'p': jsonEncode(op.toJson()),
           },
         );
         lastSeq = ins[0][0] as int;
         final adj = await session.execute(
           Sql.named(
-            'INSERT INTO entity_lamport (entity, entity_id, field, lamport, origin) '
-            'VALUES (@e, @eid, @f, @l, @d) '
+            'INSERT INTO entity_lamport (owner, entity, entity_id, field, '
+            'lamport, origin) '
+            'VALUES (@o, @e, @eid, @f, @l, @d) '
             'ON CONFLICT (entity, entity_id, field) DO UPDATE '
-            'SET lamport = EXCLUDED.lamport, origin = EXCLUDED.origin '
+            'SET lamport = EXCLUDED.lamport, origin = EXCLUDED.origin, '
+            '    owner = EXCLUDED.owner '
             'WHERE (EXCLUDED.lamport, EXCLUDED.origin) '
             '      >= (entity_lamport.lamport, entity_lamport.origin) '
             'RETURNING lamport, origin',
           ),
           parameters: {
+            'o': req.uid,
             'e': op.entity,
             'eid': op.entityId,
             'f': op.field,
@@ -127,15 +146,20 @@ final class PgSyncStore implements SyncStore {
   }
 
   @override
-  Future<PullResponse> pull({required int since, required int limit}) async {
+  Future<PullResponse> pull({
+    required int since,
+    required int limit,
+    required String owner,
+  }) async {
     if (limit < 1) {
       throw ArgumentError.value(limit, 'limit', '≥1');
     }
     final rows = await _conn.execute(
       Sql.named(
-        'SELECT seq, payload FROM sync_ops WHERE seq > @s ORDER BY seq LIMIT @l',
+        'SELECT seq, payload FROM sync_ops '
+        'WHERE seq > @s AND owner = @o ORDER BY seq LIMIT @l',
       ),
-      parameters: {'s': since, 'l': limit + 1},
+      parameters: {'s': since, 'o': owner, 'l': limit + 1},
     );
     final hasMore = rows.length > limit;
     var cursor = since;

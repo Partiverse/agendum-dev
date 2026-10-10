@@ -1,6 +1,9 @@
 /// 同步引擎 PoC 核心验收（05 文档 W5–6 / 06 文档 S06）：
 /// 两个模拟客户端经真实 HTTP handler（内存存储）并发写入，
 /// 验证最终收敛符合 03 文档 §5 冲突细则。
+///
+/// R1 起每个客户端是**注册设备**：push/pull 一律带 `X-Agendum-Auth`
+/// （每次请求取新挑战签名,nonce 单次有效）,同租户 uid 下多设备收敛。
 library;
 
 import 'dart:convert';
@@ -12,16 +15,27 @@ import 'package:agendum_sync/agendum_sync.dart';
 import 'package:shelf/shelf.dart';
 import 'package:test/test.dart';
 
-/// 模拟客户端：本地写 → push；pull 增量 → resolveEntry 重放。
+import 'harness.dart';
+
+/// 模拟客户端：注册设备 → 本地写 → push（鉴权）；pull 增量 → resolveEntry 重放。
 final class _Client {
-  _Client(this.id, this._handler);
+  _Client(this.id, Handler handler, String tenant)
+    : _handler = handler,
+      _device = _register(id, handler, tenant);
 
   final String id;
   final Handler _handler;
+  final Future<RegisteredDevice> _device;
   final state = EntitySyncState();
   final seen = <String>{};
   final clock = LamportClock();
   var cursor = 0;
+
+  static Future<RegisteredDevice> _register(
+    String id,
+    Handler handler,
+    String tenant,
+  ) => registerDevice(handler, deviceId: id, tenant: tenant);
 
   static String _key(SyncOp op) => '${op.deviceId}#${op.lamport}#${op.field}';
 
@@ -37,28 +51,32 @@ final class _Client {
     );
     seen.add(_key(op));
     state.apply(op);
+    final device = await _device;
     final res = await _handler(
       Request(
         'POST',
         Uri.parse('http://s/v1/sync/push'),
-        body: jsonEncode(PushRequest(deviceId: id, ops: [op]).toJson()),
+        headers: {authHeaderName: await device.authHeader(_handler)},
+        body: jsonEncode(
+          PushRequest(uid: device.uid, deviceId: id, ops: [op]).toJson(),
+        ),
       ),
     );
-    return PushResponse.fromJson(
-      (jsonDecode(await res.readAsString()) as Map).cast<String, Object?>(),
-    );
+    return PushResponse.fromJson(await bodyMap(res));
   }
 
   Future<int> pullOnce({int limit = 500}) async {
+    final device = await _device;
     final res = await _handler(
       Request(
         'GET',
-        Uri.parse('http://s/v1/sync/pull?since=$cursor&limit=$limit'),
+        Uri.parse(
+          'http://s/v1/sync/pull?since=$cursor&limit=$limit&uid=${device.uid}',
+        ),
+        headers: {authHeaderName: await device.authHeader(_handler)},
       ),
     );
-    final pr = PullResponse.fromJson(
-      (jsonDecode(await res.readAsString()) as Map).cast<String, Object?>(),
-    );
+    final pr = PullResponse.fromJson(await bodyMap(res));
     for (final op in pr.ops) {
       if (seen.add(_key(op))) {
         clock.observe(op.lamport);
@@ -79,8 +97,8 @@ void main() {
 
   test('PoC 场景 1：并发同字段不同 lamport → 双端收敛到高者', () async {
     final h = newServer();
-    final a = _Client('设备A', h);
-    final b = _Client('设备B', h);
+    final a = _Client('设备A', h, 'tenant-poc');
+    final b = _Client('设备B', h, 'tenant-poc');
 
     // 三次写互不感知（并发）：A 连写两版（lamport 1→2），B 写一版（lamport 1）。
     await a.write('title', '第一版');
@@ -100,8 +118,8 @@ void main() {
 
   test('PoC 场景 2：等时钟并发写 → origin 字典序破平，双端一致', () async {
     final h = newServer();
-    final a = _Client('设备A', h);
-    final b = _Client('设备B', h);
+    final a = _Client('设备A', h, 'tenant-poc');
+    final b = _Client('设备B', h, 'tenant-poc');
 
     await a.write('title', '来自A');
     await b.write('title', '来自B');
@@ -116,8 +134,8 @@ void main() {
 
   test('PoC 场景 3：并发改/删（等时钟）→ 双端收敛为墓碑', () async {
     final h = newServer();
-    final a = _Client('设备A', h);
-    final b = _Client('设备B', h);
+    final a = _Client('设备A', h, 'tenant-poc');
+    final b = _Client('设备B', h, 'tenant-poc');
 
     await a.write('title', null); // A 删除
     await b.write('title', 'B 还在改'); // B 并发修改
@@ -132,8 +150,8 @@ void main() {
 
   test('PoC 场景 4：更晚的 set 复活已删除实体（合法恢复）', () async {
     final h = newServer();
-    final a = _Client('设备A', h);
-    final b = _Client('设备B', h);
+    final a = _Client('设备A', h, 'tenant-poc');
+    final b = _Client('设备B', h, 'tenant-poc');
 
     await a.write('title', null); // A 删除（lamport 1）
     // B 先看到删除再写入：时钟观察到 1 → 本地写 lamport=2 → 更高胜出。
@@ -149,8 +167,8 @@ void main() {
 
   test('PoC 场景 5：离线累积 + 小分页 pull → 不丢不重', () async {
     final h = newServer();
-    final a = _Client('设备A', h);
-    final b = _Client('设备B', h);
+    final a = _Client('设备A', h, 'tenant-poc');
+    final b = _Client('设备B', h, 'tenant-poc');
 
     // A 离线写 5 个字段；B 全程离线。
     for (var i = 1; i <= 5; i++) {
@@ -169,8 +187,9 @@ void main() {
 
   test('PoC 场景 6：服务端裁决 ack —— stale op 返回 accepted=false', () async {
     final h = newServer();
-    final a = _Client('设备A', h);
-    final b = _Client('设备B', h);
+    final a = _Client('设备A', h, 'tenant-poc');
+    final b = _Client('设备B', h, 'tenant-poc');
+    final c = _Client('设备C', h, 'tenant-poc');
 
     await a.write('title', '新值'); // A: lamport 1
     await a.pullUntilQuiet();
@@ -181,7 +200,7 @@ void main() {
     // B 再写一次把裁决头抬到更高 lamport，随后 stale op 必被拒。
     await b.write('title', 'B 再写一次');
 
-    // 手工构造 stale op（lamport 落后）→ 服务端 ack 拒绝。
+    // 手工构造 stale op（lamport 落后）→ 经设备 C 的鉴权通道推送,服务端 ack 拒绝。
     final stale = SyncOp(
       deviceId: '设备C',
       lamport: 1,
@@ -191,16 +210,18 @@ void main() {
       type: SyncOpType.set,
       value: const OpValue(OpValueTypes.str, '过期写入'),
     );
+    final device = await c._device;
     final res = await h(
       Request(
         'POST',
         Uri.parse('http://s/v1/sync/push'),
-        body: jsonEncode(PushRequest(deviceId: '设备C', ops: [stale]).toJson()),
+        headers: {authHeaderName: await device.authHeader(h)},
+        body: jsonEncode(
+          PushRequest(uid: device.uid, deviceId: '设备C', ops: [stale]).toJson(),
+        ),
       ),
     );
-    final pr = PushResponse.fromJson(
-      (jsonDecode(await res.readAsString()) as Map).cast<String, Object?>(),
-    );
+    final pr = PushResponse.fromJson(await bodyMap(res));
     expect(pr.results.single.accepted, isFalse);
   });
 }
