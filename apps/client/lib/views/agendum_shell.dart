@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'misc_views.dart';
+import 'identity_sheet.dart';
 import 'store.dart';
 import 'task_row.dart';
 import 'capture_bar.dart';
@@ -182,11 +183,22 @@ class _InboxPane extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
       children: [
-        Text(
-          '收件箱',
-          style: Theme.of(
-            context,
-          ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w700),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                '收件箱',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            IconButton(
+              tooltip: '身份与恢复',
+              icon: const Icon(Icons.key_outlined),
+              onPressed: () => showIdentitySheet(context, store),
+            ),
+          ],
         ),
         const SizedBox(height: 12),
         CaptureBar(store: store, focusNode: captureFocus),

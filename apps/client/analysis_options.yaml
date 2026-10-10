@@ -3,4 +3,6 @@ analyzer:
     - build/**
     - ios/**
     - macos/**
+    - android/**
+    - linux/**
 include: ../../analysis_options.yaml

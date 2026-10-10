@@ -13,6 +13,11 @@ const _serverBase = String.fromEnvironment(
   defaultValue: 'http://localhost:8090',
 );
 
+/// 显式恢复短语(构建期注入,`--dart-define=AGENDUM_RECOVERY_PHRASE="…"`):
+/// 第二台设备「凭短语接入」用,优先于 KeyStore 已存值并回写(identity.dart
+/// R1 §7)。常规首启留空 —— 身份页(收件箱右上角钥匙图标)可查看本机短语。
+const _recoveryPhrase = String.fromEnvironment('AGENDUM_RECOVERY_PHRASE');
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final support = await getApplicationSupportDirectory();
@@ -23,6 +28,7 @@ Future<void> main() async {
     // 演示种子只进 demo/测试(显式传 true);生产首启必须是干净的用户库。
     seedIfEmpty: false,
     serverBase: _serverBase,
+    recoveryPhrase: _recoveryPhrase.isEmpty ? null : _recoveryPhrase,
   );
   runApp(AgendumApp(store: store));
 }
