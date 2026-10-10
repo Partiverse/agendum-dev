@@ -112,9 +112,17 @@ class TaskRepository {
       });
 
   /// 字段级编辑(任务详情页用;字段名必须是 tasks 白名单列)。
+  /// 红线:status 不允许旁路 —— 状态变更必须走 [setTaskStatus]
+  /// (经 transition 校验并联动 completed_at);墓碑行拒绝编辑。
   Future<void> editTask(String id, Map<String, Object?> changes) =>
       _db.transaction(() async {
+        if (changes.containsKey('status')) {
+          throw ArgumentError('status 变更必须走 setTaskStatus(状态机红线),editTask 拒绝');
+        }
         final row = await _byId(id);
+        if (row.deletedAt != null) {
+          throw ArgumentError('任务已删除,拒绝编辑:$id');
+        }
         await _edit(row, changes);
       });
 

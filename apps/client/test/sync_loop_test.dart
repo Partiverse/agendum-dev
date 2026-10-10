@@ -70,4 +70,43 @@ void main() {
     expect(aTitles, {'买牛奶', 'A 本地捕获', 'B 本地捕获'});
     expect(bTitles, aTitles);
   });
+
+  test('两设备收敛:远端删项目 → 对端任务回收进收件箱(S07 关系完整性)', () async {
+    final a = await newDevice();
+    final b = await newDevice();
+    addTearDown(a.close);
+    addTearDown(b.close);
+
+    // A 建项目 + 挂任务并推进到 next,推送;B 拉到项目与任务。
+    await a.addProject('装修');
+    final pid = a.projectList.single.id;
+    await a.addManual('选瓷砖');
+    final taskId = a.inboxTasks.single.id;
+    await a.setTaskProject(taskId, pid);
+    await a.promoteToNext(taskId);
+    await a.syncNow();
+
+    await b.syncNow();
+    expect((await b.tasksInProject(pid)).single.id, taskId);
+
+    // A 删项目(本地任务回收)→ 同步后 B 收敛:项目消失、任务回收进收件箱。
+    await a.deleteProject(pid);
+    await a.syncNow();
+    await b.syncNow();
+    await a.syncNow(); // 收 B 的回收 op,两端终态一致
+
+    expect(a.projectList.where((p) => p.id == pid), isEmpty);
+    expect(b.projectList.where((p) => p.id == pid), isEmpty, reason: '墓碑传播到 B');
+    expect((await b.tasksInProject(pid)), isEmpty);
+    expect(
+      b.inboxTasks.map((t) => t.id),
+      contains(taskId),
+      reason: 'B 的任务回收进收件箱',
+    );
+    expect(
+      a.inboxTasks.map((t) => t.id),
+      contains(taskId),
+      reason: 'A 的任务回收进收件箱',
+    );
+  });
 }

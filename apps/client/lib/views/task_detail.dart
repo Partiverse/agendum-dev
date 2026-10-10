@@ -512,8 +512,8 @@ class _StatusChips extends StatelessWidget {
             onSelected: (_) async {
               try {
                 await store.setTaskStatus(task.id, status);
-              } on Error {
-                // 领域红线(IllegalTransitionError):提示而不崩。
+              } on IllegalTransitionError {
+                // 领域红线:提示而不崩;其余 Error 属编程缺陷,不静默吞。
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(

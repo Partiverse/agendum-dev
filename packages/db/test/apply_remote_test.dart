@@ -139,20 +139,21 @@ void main() {
       ),
       isFalse,
     );
+    // project 实体现在落地(见 project_remote_test);这里验证真正未知的实体仍跳过。
     expect(
       await sync.applyRemoteOp(
         SyncOp(
           deviceId: 'dvc_a',
           lamport: 9,
-          entity: 'project',
-          entityId: 'p1',
+          entity: 'tag_group',
+          entityId: 'g1',
           field: rowCreateField,
           type: SyncOpType.set,
-          value: OpValue(OpValueTypes.json, {'name': '项目'}),
+          value: OpValue(OpValueTypes.json, {'name': '组'}),
         ),
       ),
       isFalse,
-      reason: 'PoC 只同步 task 实体',
+      reason: '未知实体前向兼容跳过,游标照推',
     );
   });
 

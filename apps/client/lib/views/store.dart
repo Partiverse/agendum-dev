@@ -171,6 +171,13 @@ class TaskStore extends ChangeNotifier {
     await _reload();
   }
 
+  /// 删除项目(项目内任务回收件箱);返回回收的任务数。
+  Future<int> deleteProject(String id) async {
+    final recycled = await _projects.deleteProject(id);
+    await _reload();
+    return recycled;
+  }
+
   /// 项目内任务(项目详情展开用)。
   Future<List<TaskItem>> tasksInProject(String projectId) async {
     final tagsByTask = await _tags.allTaskTagsSnapshot();

@@ -73,6 +73,14 @@ final class PgSyncStore implements SyncStore {
   Future<PushResponse> push(PushRequest req) async {
     final results = <PushOpResult>[];
     var lastSeq = 0;
+    if (req.ops.isEmpty) {
+      // 空批量返回当前全局序号(与 MemorySyncStore 语义一致,
+      // 调用方不会把游标重置回 0 触发全量重拉)。
+      final rows = await _conn.execute(
+        Sql.named('SELECT COALESCE(MAX(seq), 0) FROM sync_ops'),
+      );
+      return PushResponse(serverSeq: rows[0][0] as int, results: results);
+    }
     await _conn.runTx((session) async {
       for (final op in req.ops) {
         final ins = await session.execute(

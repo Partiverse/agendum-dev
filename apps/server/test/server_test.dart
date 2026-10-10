@@ -6,6 +6,37 @@ import 'package:shelf/shelf.dart';
 import 'package:test/test.dart';
 
 void main() {
+  test('空批量 push 返回当前全局序号(不重置为 0,对齐 Memory/Pg 两实现)', () async {
+    final store = MemorySyncStore();
+    final empty = await store.push(
+      PushRequest(deviceId: 'dvc_a', ops: const []),
+    );
+    expect(empty.serverSeq, 0, reason: '空库当前序号即 0');
+
+    final one = await store.push(
+      PushRequest(
+        deviceId: 'dvc_a',
+        ops: [
+          SyncOp(
+            deviceId: 'dvc_a',
+            lamport: 1,
+            entity: 'task',
+            entityId: 'e1',
+            field: 'title',
+            type: SyncOpType.set,
+            value: const OpValue('str', 't'),
+          ),
+        ],
+      ),
+    );
+    expect(one.serverSeq, 1);
+
+    final emptyAgain = await store.push(
+      PushRequest(deviceId: 'dvc_a', ops: const []),
+    );
+    expect(emptyAgain.serverSeq, 1, reason: '回到当前序号而非重置');
+  });
+
   late Handler handler;
 
   setUp(() {

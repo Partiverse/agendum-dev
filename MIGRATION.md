@@ -115,3 +115,16 @@ CI 即 `ubuntu-latest`（`.github/workflows/pr-ci.yml`，Flutter 3.47.4），**�
 - `~/.zcode/v2/`（`tasks-index.sqlite`、`setting.json`）、`~/.zcode/cli/db/db.sqlite` 可作只读档案带走；**凭证类（`provider_config.json`、`credentials.json`）建议不拷贝，Linux 重新登录**。
 - 插件缓存（`~/.zcode/cli/plugins/cache/`）在 Linux 重新下载即可；`certs/zcode-network-ca` 如有代理抓包需求再迁。
 - 定时任务/闲时任务：已确认为空，无迁移项。
+
+---
+
+## 迁移验收记录（2026-10-09，Linux）
+
+§2.4 规定的「迁移后第一件事跑 `make ci`」于本日执行完毕，**exit 0**：
+
+- 工具链：Flutter 3.47.4 stable（国内镜像安装于 `~/.local/flutter`，未用 mise）。
+- `make ci` 全绿：fmt / analyze（10 包 --fatal-infos）/ test（含 e2ee 24 例、PG 实跑 26 例）/ golden eval 门槛 0.75 PASS。
+- PG 路径首次在本机真实验证：`docker compose up -d postgres` + `DATABASE_URL` 注入（此前 CI 恒 skip）。
+- `pubspec.lock` 由 Linux 工具链重解析（若干 transitive 升版），属迁移副产物，CI 首跑会以 pub.dev URL 重写。
+- 同批落地 R0 修复与新增测试，见 `docs/reviews/2026-10-09-革命性改进蓝图.md` §1。
+- 未完成：`linux/` 平台目录仍缺（桌面端跑不起来，仅测试可用）；golden 基线仍 macOS 专用（@Skip 中）。

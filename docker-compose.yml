@@ -10,7 +10,7 @@ services:
     ports:
       # 宿主机 5432 可能被本机 Postgres 占用（127.0.0.1 优先于 Docker 通配绑定），
       # 故映射到 5433。连接串: postgres://agendum:agendum_dev_only@localhost:5433/agendum_dev
-      - '5433:5432'
+      - '127.0.0.1:5433:5432'
     volumes:
       - agendum_pgdata:/var/lib/postgresql/data
     healthcheck:

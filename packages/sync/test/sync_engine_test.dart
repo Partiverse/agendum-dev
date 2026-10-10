@@ -15,6 +15,9 @@ class FakeStore implements LocalSyncStore {
   int cursor = 0;
   int pushedMarkCalls = 0;
 
+  /// 应用时抛错的毒丸 op(死信隔离行为验证用)。
+  Set<SyncOp> poison = const {};
+
   @override
   Future<List<PendingOp>> takePendingOps({int limit = 500}) async =>
       pending.take(limit).toList();
@@ -34,6 +37,9 @@ class FakeStore implements LocalSyncStore {
 
   @override
   Future<bool> applyRemoteOp(SyncOp op) async {
+    if (poison.contains(op)) {
+      throw StateError('非法字段值:${op.field}');
+    }
     applied.add(op);
     return true;
   }
@@ -150,6 +156,30 @@ void main() {
     expect(transport.pullSinces, [0, 100], reason: '按 cursor 增量续传');
     expect(store.applied.map((o) => o.entityId), ['e1', 'e2', 'e3']);
     expect(store.cursor, 200);
+  });
+
+  test('pull:毒丸 op 死信隔离,游标照推,后续 op 不被阻塞', () async {
+    final store = FakeStore();
+    final transport = FakeTransport();
+    final poison = op('dvc_a', 1, 'e1');
+    final good = op('dvc_a', 2, 'e2');
+    store.poison = {poison};
+    transport.onPull = (since, limit) =>
+        PullResponse(cursor: 100, ops: [poison, good], hasMore: false);
+    final quarantined = <SyncOp>[];
+    final engine = SyncEngine(
+      store: store,
+      transport: transport,
+      onQuarantined: (op, error) => quarantined.add(op),
+    );
+
+    await engine.pull();
+
+    expect(quarantined.map((o) => o.entityId), ['e1']);
+    expect(store.applied.map((o) => o.entityId), [
+      'e2',
+    ], reason: '毒丸之后的好 op 照常应用');
+    expect(store.cursor, 100, reason: '游标越过毒丸,下一轮不重拉');
   });
 
   test('syncNow:先推后拉(传输事件顺序)', () async {

@@ -78,6 +78,7 @@ class SyncEngine {
     this.pullLimit = 2000,
     this.onTrace,
     this.onRemoteApplied,
+    this.onQuarantined,
     OpCodec? codec,
   }) : _store = store,
        _transport = transport,
@@ -95,6 +96,11 @@ class SyncEngine {
 
   /// 远端 op 落地后的通知(每批一次;UI 层借此刷新缓存)。
   final void Function()? onRemoteApplied;
+
+  /// 毒丸 op 死信通知:应用失败的远端 op(字段值非法、解码失败等)被隔离,
+  /// 游标照推 —— 单条坏 op 只损失自身,不再卡死该设备之后的全部同步。
+  /// 死信持久化与快照补齐属后续演进;当前 op 已越过游标,不会被重拉。
+  final void Function(SyncOp op, Object error)? onQuarantined;
 
   bool _syncing = false;
   Timer? _timer;
@@ -122,19 +128,38 @@ class SyncEngine {
   }
 
   /// 按 cursor 增量拉取直到 has_more 为假;逐条本地裁决应用。
+  ///
+  /// 毒丸隔离:单条 op **应用**失败(字段值非法等)只隔离自身(死信),
+  /// 不中断本批、不回退游标 —— 后续 op 照常同步;失败 op 已被游标越过,
+  /// 不会重拉。**解码**失败(密钥缺失/密文损坏)不隔离、原样抛出 ——
+  /// 那是配置错误,静默跳过等于无声丢掉全部远端数据。
   Future<void> pull() async {
     var since = await _store.pullCursor();
     while (true) {
       final resp = await _transport.pull(since: since, limit: pullLimit);
-      for (final op in resp.ops) {
-        await _store.applyRemoteOp(await _codec.decodeFromWire(op));
+      var applied = 0;
+      for (final wireOp in resp.ops) {
+        final op = await _codec.decodeFromWire(wireOp);
+        try {
+          if (await _store.applyRemoteOp(op)) applied++;
+        } catch (error) {
+          _quarantine(op, error);
+        }
       }
-      if (resp.ops.isNotEmpty) onRemoteApplied?.call();
+      if (applied > 0) onRemoteApplied?.call();
       since = resp.cursor;
       await _store.setPullCursor(resp.cursor);
       if (resp.ops.isNotEmpty) _trace('pull ${resp.ops.length} ops → $since');
       if (!resp.hasMore) return;
     }
+  }
+
+  void _quarantine(SyncOp op, Object error) {
+    _trace(
+      '死信隔离 ${op.entity}/${op.field}@${op.entityId} '
+      'lamport=${op.lamport}:$error',
+    );
+    onQuarantined?.call(op, error);
   }
 
   /// 一轮完整同步:先推后拉(推送可能改变服务端序号,先推保序)。

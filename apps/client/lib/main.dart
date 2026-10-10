@@ -17,7 +17,8 @@ Future<void> main() async {
   final support = await getApplicationSupportDirectory();
   final store = await TaskStore.open(
     executor: openNativeFileExecutor('${support.path}/agendum.sqlite3'),
-    seedIfEmpty: true,
+    // 演示种子只进 demo/测试(显式传 true);生产首启必须是干净的用户库。
+    seedIfEmpty: false,
     serverBase: _serverBase,
   );
   runApp(AgendumApp(store: store));
