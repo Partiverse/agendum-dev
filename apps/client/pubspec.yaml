@@ -19,6 +19,7 @@ dependencies:
     ^2.27.0
   flutter:
     sdk: flutter
+  flutter_secure_storage: ^11.2.0
   path_provider: ^2.1.0
   sqlite3_flutter_libs: ^0.5.24
 
